@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+    node1:
+        image: app:latest
+        ports:
+            - 5001:5000
+        environment:
+            DB_HOST: node1-db
+            DB_USER: node1
+            DB_PASSWORD: node1#Password
+            FLASK_ENV: development
+
+    node1-db:
+        image: mongo:4.2.5
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: node1
+            MONGO_INITDB_ROOT_PASSWORD: node1#Password
