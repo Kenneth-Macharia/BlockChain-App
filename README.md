@@ -1,4 +1,4 @@
-# Blockhchain Demo App
+# Blockchain Demo App
 ## Description
 A minimalist demo application, simulating land records deployed as a blockchain.
 
