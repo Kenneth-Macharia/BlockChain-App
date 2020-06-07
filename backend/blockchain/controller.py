@@ -91,7 +91,7 @@ class BlockController(object):
             BlockModel().delete_chain()
 
             for block in new_chain:
-                BlockModel().insert_one(block)
+                BlockModel().persist_new_block(block)
 
             return True
 
