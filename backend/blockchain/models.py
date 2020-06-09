@@ -53,7 +53,7 @@ class NodeModel(object):
         self.__db_conn = mongo.db.nodes_collection
 
     def get_all_nodes(self, length=False):
-        ''' Returns all nodes in the network number of node if param[length] is set to True -> cursor object or int '''
+        ''' Returns all nodes in the network or number of node if param[length] is set to True -> cursor object or int '''
 
         if length == True:
             return self.__db_conn.count_documents({})

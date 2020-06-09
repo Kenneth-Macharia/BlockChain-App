@@ -9,7 +9,8 @@ from .blockchain.blockchain import blockchain_bp
 
 def create_app(config_object='backend.configs'):
     '''
-    This is the app factory where the app is initialized (plugins e.g dbs and configs) and all it's extensions (blueprints) recorded.
+    This is the app factory where the app is initialized with its plugins
+    and configs and all it's extensions (blueprints) recorded.
     '''
 
     # Initialize app with it's configurations

@@ -2,7 +2,8 @@ version: "2"
 
 services:
     node1:
-        image: app:latest
+        build: ../backend
+        image: blockchain-app
         ports:
             - 5001:5000
         environment:

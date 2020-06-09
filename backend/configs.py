@@ -4,7 +4,7 @@ This module fetches and sets up app configurations
 
 import os
 
-#Application configurations
+# Application configurations
 
 
 # Database configurations

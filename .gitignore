@@ -6,3 +6,6 @@ node_modules
 .vscode
 *.code-workspace
 .condaauto
+Dockerfile
+.dockerignore
+nodes

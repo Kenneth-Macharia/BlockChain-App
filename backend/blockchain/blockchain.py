@@ -1,3 +1,4 @@
+#TODO:Re-word this to also explain this module function
 '''
 This module defines the blockchain blueprint extension to the main flask app
 '''
@@ -12,9 +13,11 @@ blockchain_bp = Blueprint('blockchain_bp', __name__)
 # Generate a globally unique address for this node
 node_id = str(uuid4()).replace('-', '')
 
+#TODO: Group related endpoints and name them appropritely
+
 @blockchain_bp.route('/', methods=['GET'])
 def index():
-    return jsonify('Changes to the blockchain app')
+    return jsonify('Blockchain app is running....')
 
 @blockchain_bp.route('/mine', methods=['POST'])
 def mine():
@@ -22,13 +25,14 @@ def mine():
     1. Calculates the Proof of Work
     2. Rewards the miner (us) by adding a transaction granting us 1 coin
     3. Forges the new Block by adding it to the chain
+    4. Returns the newly forged block -> json
     '''
 
     # Fetch the transaction data from front-end
     values = request.get_json()
 
     # Check that the required fields are in the POST data
-    required = ['plot_number', 'location', 'county', 'seller_id', 'buyer_id', 'amount', 'original_owner']
+    required = ['plot_number', 'size', 'location', 'county', 'seller_id', 'buyer_id', 'amount', 'original_owner']
 
     if not all(k in values for k in required):
         return "Missing values", 400
@@ -36,6 +40,7 @@ def mine():
     # Prepare the transfer transaction
     transaction = {
         'plot_number': values['plot_number'],
+        'size': values['size'],
         'location': values['location'],
         'county': values['county'],
         'seller_id': values['seller_id'],
@@ -62,7 +67,7 @@ def mine():
 @blockchain_bp.route('/chain', methods=['GET'])
 def full_chain():
     '''
-    Exposes the entire blockchain
+    Exposes the entire blockchain -> json
     '''
 
     block_List = BlockController().extract_chain()
@@ -79,7 +84,7 @@ def full_chain():
 @blockchain_bp.route('/nodes/register', methods=['POST'])
 def register_nodes():
     '''
-    Accepts a list of new nodes in the from of urls
+    Accepts a new peer node in the from of {"address": "http://192.168.100.208:5002"} and returns the newly registerd node -> json
     '''
 
     # Fetch node data from front-end
@@ -99,6 +104,8 @@ def register_nodes():
 
 @blockchain_bp.route('/nodes/resolve', methods=['GET'])
 def consensus():
+    '''  Reconciles our chain with the blockchain network i.e finds the longest, valid chain in the network and replaces ours with it. If a chain longer than our is not found in the network, then our chain is considered up-to-date -> json '''
+
     replaced = BlockController().update_chain()
     chain = []
 

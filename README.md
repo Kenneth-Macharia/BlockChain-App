@@ -11,7 +11,7 @@ The app is made up of:
 And will also require:
 
     1. A Redis cache between the frontend and backend services
-    2. A MongoDB database connected to the backend service
+    2. A MongoDB database persistant storage
 
 Each service will be packaged in a Docker container and deployed to a Swarm cluster alongisde containers for the two data stores.
 

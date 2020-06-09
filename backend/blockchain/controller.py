@@ -1,3 +1,4 @@
+#TODO: update this
 '''
 This module is the interface between the Redis cache and the persistant back-end. It:
 
@@ -14,6 +15,10 @@ from time import time
 from urllib.parse import urlparse
 from .models import BlockModel, NodeModel
 
+#TODO: Work out connection and updating Redis upon chain & node updates
+#TODO: If initial node is added, query its data (nodes & chain) and update ours
+#TODO: If a transaction is added, first check our chain is up-to-date before persisting (involves checking our nodes are first up-to-date)
+
 class BlockController(object):
     ''' Manages block forging, blockchain verification and security. '''
 
@@ -24,10 +29,9 @@ class BlockController(object):
 
         # Create seed block
         if BlockModel().get_chain(True) == 0:
-            self.new_block(proof=100, previous_hash=10, index=1)
+            self.new_block(proof=100, previous_hash=10, index=1,
+                transactions=['Seed Block'])
 
-
-        #TODO If not first block, update blockchain from network peer added via UI
 
     def extract_chain(self):
         ''' Return the full blockchain from the back-end -> list '''
@@ -65,7 +69,7 @@ class BlockController(object):
         '''
 
         # Get all the peer nodes in our records
-        neighbour_nodes = NodeController().fetch_all_nodes()
+        neighbour_nodes = NodeController().extract_nodes()
 
         # Initialize our chain as currently the longest
         max_length = BlockModel().get_chain(True)
@@ -75,7 +79,7 @@ class BlockController(object):
         # Grab and verify the chains from all the nodes in our network
         for node in neighbour_nodes:
             # For each node in our records, fetch its chain
-            response = requests.get(f'http://{node["address"]}/chain')
+            response = requests.get(f'http://{node["address"]}/backend/chain')
 
             if response.status_code == 200:
                 length = response.json()['length']
@@ -158,13 +162,20 @@ class BlockController(object):
 class NodeController(object):
     ''' Manages peer-to-peer node relationship in the blockchain network. '''
 
-    def fetch_all_nodes(self):
-        return NodeModel().get_all_nodes()
+    def extract_nodes(self):
+        ''' Return all the registered peer nodes from the back-end -> list '''
 
+        result_cursor = NodeModel().get_all_nodes()
+        nodes = []
+
+        for document in result_cursor:
+            nodes.append(document)
+
+        return nodes
 
     def register_node(self, address):
         '''
-        Adds new node, ensuring it is not already registered, beforehand. Address of node (str) e.g 'http://198.162.1.2:5000' -> None
+        Adds a new peer node address ('http://198.162.1.2:5000'), ensuring it is not already registered -> dict {'address': '198.162.1.2:5000'}
         '''
 
         parsed_url = urlparse(address).netloc
