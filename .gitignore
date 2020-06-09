@@ -1,9 +1,4 @@
-.DS_Store
-.vscode
-*.code-workspace
-.condaauto
+docker
 __pycache__
-*.pyc
-Dockerfile
-.dockerignore
-nodes
+.DS_Store
+.condaauto
