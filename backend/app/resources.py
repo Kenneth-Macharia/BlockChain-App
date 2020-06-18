@@ -7,7 +7,6 @@ from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
 
 
-# Initialize this module as a flask app blueprint
 app_bp = Blueprint('app_bp', __name__)
 
 # TODO: Use actual atuhorization rather than passing key via headers
