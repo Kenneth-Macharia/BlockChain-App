@@ -19,7 +19,7 @@ from ..configs import KEY, INIT_NODE_IP
 from .models import BlockModel, NodeModel
 
 
-# TODO:Work out connection and updating Redis upon chain & node updates
+# TODO:Implement connection and updating Redis upon chain & node updates
 
 class BlockController(object):
     ''' Manages block forging and access to the blockchain '''
@@ -29,10 +29,8 @@ class BlockController(object):
 
         self.blockchain_db = BlockModel()
 
-        # If init node, create seed block
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
-
             self.create_block(proof=100, previous_hash=10, index=1,
                               transactions=['Seed Block'])
 
@@ -100,10 +98,7 @@ class BlockController(object):
             return None
 
         result_cursor = self.blockchain_db.get_chain()
-        chain = []
-
-        for document in result_cursor:
-            chain.append(document)
+        chain = [document for document in result_cursor]
 
         return chain
 
@@ -129,19 +124,15 @@ class BlockController(object):
 
         response_data, max_len, endpoint = None, 0, ''
 
-        # Sync nodes ONLY
         endpoint = 'nodes'
         max_len = len(nodes_list)
         response_data = NetworkController().request_data(
             nodes_list, endpoint, max_len, update_chain)
 
         # TODO: Investigate why init node's seed is being replaced by
-        # node 2 empty chain.
-
-        # TODO: Logical problem with this code
+        # node 2 empty chain. Logical problem with this code?
 
         if update_chain:
-            # Sync chain ALSO
             endpoint = 'blocks'
             max_len = self.blockchain_db.get_chain(True)
             response_data = NetworkController().request_data(
@@ -171,9 +162,8 @@ class NodeController(object):
         self.nodes_db = NodeModel()
         self.node_id = str(uuid4()).replace('-', '')
         self.node_host = urlparse(request.host_url).netloc
-        # e.g {'198.162.1.2:5000'}
+        # {'198.162.1.2:5000'}
 
-        # If not init node, register the init node
         if INIT_NODE_IP != 'None':
             self.register_node(INIT_NODE_IP)
 
@@ -196,12 +186,9 @@ class NodeController(object):
         '''
 
         result_cursor = self.nodes_db.get_nodes()
-        neighbour_nodes = []
+        peer_nodes = [document['node_url'] for document in result_cursor]
 
-        for document in result_cursor:
-            neighbour_nodes.append(document['node_url'])
-
-        return neighbour_nodes if len(neighbour_nodes) > 0 else []
+        return peer_nodes if len(peer_nodes) > 0 else []
 
 
 class NetworkController(object):
@@ -272,7 +259,7 @@ class SecurityController(object):
         '''
         Returns a valid proof for the new block to be forged. Computation
         algorithm: Find a number 'proof' (for the current block being forged)
-        such that concat(last_proof, proof) conatains at least 4 leading zeros
+        such that concat(last_proof, proof) contains at least 4 leading zeros
         -> int
         '''
 
@@ -317,12 +304,10 @@ class SecurityController(object):
         while current_index < len(chain):
             current_block = chain[current_index]
 
-            # Check that all the block hashes in the chain are correct
             if current_block['previous_hash'] != \
                     self.hash_block(previous_block):
                 return False
 
-            # Check that all the block proofs in the chain are correct
             if not self.validate_proof(previous_block['proof'],
                                        current_block['proof']):
                 return False

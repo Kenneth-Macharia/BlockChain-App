@@ -1,19 +1,16 @@
 # Blockchain Demo App
 ## Description
-A minimalist demo application, simulating land records deployed as a blockchain.
+A minimalist demo application, simulating records deployed as a blockchain.
 
 ## The Components
 The app is made up of:
 
     1. A Node.js frontend service
-    2. A Python backend service
+    2. A Flask-Restful backend API service
+    3. A Redis cache service between the frontend and backend services
+    4. A MongoDB database backend service
 
-And will also require:
-
-    1. A Redis cache between the frontend and backend services
-    2. A MongoDB database persistant storage
-
-Each service will be packaged in a Docker container and deployed to a Swarm cluster alongisde containers for the two data stores.
+Each service will be packaged into a Docker image for deployment and orchestration.
 
 ## Author
 Kenneth Macharia

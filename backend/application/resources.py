@@ -7,7 +7,7 @@ from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
 
 
-# Initialize this module as a blueprint
+# Initialize this module as a flask app blueprint
 app_bp = Blueprint('app_bp', __name__)
 
 # TODO: Use actual atuhorization rather than passing key via headers
@@ -18,7 +18,7 @@ class BlockResource(Resource):
 
     def post(self):
         '''
-        Exposes the unprotect block forging endpoint, internally to the
+        Exposes the unprotected block forging endpoint, internally to the
         frontend service -> json
 
         Input samples:
@@ -106,7 +106,8 @@ class BlockResources(Resource):
     ''' Manages block resources '''
 
     def get(self):
-        ''' Exposes the protected get entire blockchain endpoint -> json '''
+        ''' Exposes the protected get entire blockchain endpoint to ther peer
+        nodes -> json '''
 
         # TODO:DO NOT AUTHORIZE YOURSELF
 
@@ -142,8 +143,8 @@ class NodeResources(Resource):
     ''' Manages node resources '''
 
     def get(self):
-        ''' Exposes the protected get all registered peer nodes endpoint
-        -> json '''
+        ''' Exposes the protected get all registered peer nodes endpoint to
+        other peer nodes -> json '''
 
         # TODO:DO NOT AUTHORIZE YOURSELF
 
