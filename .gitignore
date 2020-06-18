@@ -1,4 +1,6 @@
-docker
+Dockerfile
+compose
 __pycache__
 .DS_Store
 .condaauto
+local_run.sh

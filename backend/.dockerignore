@@ -1,2 +1,4 @@
 __pycache__
 .DS_Store
+.condaauto
+local_run.sh
