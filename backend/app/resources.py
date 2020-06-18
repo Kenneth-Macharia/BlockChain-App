@@ -9,8 +9,6 @@ from .controllers import SecurityController, NodeController, BlockController
 
 app_bp = Blueprint('app_bp', __name__)
 
-# TODO: Use actual atuhorization rather than passing key via headers
-
 
 class BlockResource(Resource):
     ''' Manages a block resource '''
