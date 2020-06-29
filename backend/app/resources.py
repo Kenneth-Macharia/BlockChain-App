@@ -75,21 +75,20 @@ class BlockResource(Resource):
             }
         }
 
-        forged_block = BlockController().create_block(
-            transactions=transaction)
+        result = BlockController().create_block(
+            transaction=transaction)
 
         message, status_code, payload = '', 0, []
 
-        if forged_block is None:
-            message = 'Transaction not recorded. Register atleast one \
-                peer node to maintain blockchain integrity'
+        if 'sync_error' in result.keys():
+            message = 'Sync Failure'
             status_code = 403
-            payload = []
+            payload = result['sync_error']
 
         else:
             message = 'Transaction recorded'
             status_code = 201
-            payload = forged_block
+            payload = result
 
         response = {
             'message': message,
@@ -106,22 +105,23 @@ class BlockResources(Resource):
         ''' Exposes the protected get entire blockchain endpoint to ther peer
         nodes -> json '''
 
-        # TODO:DO NOT AUTHORIZE YOURSELF
+        url = SecurityController().authorize_node(request.headers)
 
-        if not SecurityController().authorize_node(request.headers['key']):
+        if not url:
             message = 'Request from an unauthorized node'
             status_code = 401
             payload = None
 
         else:
-            NodeController().register_node(request.headers['url'])
+            blocks = BlockController()
+            NodeController().register_node(url)
 
-            result = BlockController().extract_chain()
+            result = blocks.extract_chain()
 
-            if isinstance(result, dict):
-                message = 'Pending transactions'
+            if result is None:
+                message = 'Chain not complete due to pending transactions'
                 status_code = 403
-                payload = result['error_nodes']
+                payload = []
 
             else:
                 message = 'Blockchain'
@@ -143,15 +143,16 @@ class NodeResources(Resource):
         ''' Exposes the protected get all registered peer nodes endpoint to
         other peer nodes -> json '''
 
-        # TODO:DO NOT AUTHORIZE YOURSELF
+        url = SecurityController().authorize_node(request.headers)
 
-        if not SecurityController().authorize_node(request.headers['key']):
+        if not url:
             message = 'Request from an unauthorized node'
             status_code = 401
             payload = None
 
         else:
-            NodeController().register_node(request.headers['url'])
+            BlockController()
+            NodeController().register_node(url)
 
             node_List = NodeController().extract_nodes()
             message = 'Registered_nodes'

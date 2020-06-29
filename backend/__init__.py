@@ -5,7 +5,8 @@ The flask app is built here.
 from flask import Flask
 from flask_restful import Api
 from .plugins import mongo
-from .application.resources import app_bp, BlockResource, BlockResources, NodeResources
+from .app.resources import app_bp, BlockResource, BlockResources, NodeResources
+
 
 def create_app(config_object='backend.configs'):
     '''
@@ -30,7 +31,8 @@ def create_app(config_object='backend.configs'):
         api.add_resource(BlockResources, '/blocks')
         api.add_resource(NodeResources, '/nodes')
 
-        # Register app blueprints e.g app.register_blueprint(api_bp, url_prefix='/api')
+        # Register app blueprints e.g app.register_blueprint(api_bp,
+        # url_prefix='/api')
         app.register_blueprint(app_bp, url_prefix='/backend')
 
     return app

@@ -8,14 +8,14 @@ This interfacing module:
     4. Syncs blockchain and node registry data with other peer nodes.
 '''
 
-import hashlib
 import json
 import requests
+import hashlib
 from flask import request
 from time import time
 from uuid import uuid4
 from urllib.parse import urlparse
-from ..configs import KEY, INIT_NODE_IP
+from ..configs import SECRET_KEY, INIT_NODE_IP
 from .models import BlockModel, NodeModel
 
 
@@ -23,6 +23,8 @@ from .models import BlockModel, NodeModel
 
 class BlockController(object):
     ''' Manages block forging and access to the blockchain '''
+
+    pending_transactions = False
 
     def __init__(self):
         ''' Initializes this node with a seed block '''
@@ -32,12 +34,10 @@ class BlockController(object):
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
             self.create_block(proof=100, previous_hash=10, index=1,
-                              transactions=['Seed Block'])
-
-        self.pending_transactions = False
+                              transaction=['Seed Block'])
 
     def create_block(self, proof=None, previous_hash=None,
-                     index=None, transactions=[]):
+                     index=None, transaction={}):
 
         '''
         1. Updates the chain, (ensuring all node have successfully
@@ -59,14 +59,12 @@ class BlockController(object):
 
         sync_result = self.sync(update_chain=True)
 
-        if sync_result is not None:
+        if sync_result and index is None:
+            BlockController.pending_transactions = True
 
-            # TODO: Ensure transaction details are left in Redis
-            # until successful sync
-
+            # TODO: Leave transactions in Redis until successful sync
             # TODO: Timed re-sync for prior failed syncs
 
-            self.pending_transactions = True
             return sync_result
 
         security = SecurityController()
@@ -75,7 +73,7 @@ class BlockController(object):
         block = {
             'index': index or (last_block['index'] + 1),
             'timestamp': time(),
-            'transaction': transactions,
+            'transaction': transaction,
             'proof': proof or security.proof_of_work(last_block['proof']),
             'previous_hash': previous_hash or security.hash_block(last_block)
         }
@@ -83,9 +81,9 @@ class BlockController(object):
         self.blockchain_db.persist_new_block(block)
 
         # TODO: Remove successful transaction details from Redis
-        # TODO: Check no pending tranactions in Redis first
 
-        self.pending_transactions = False
+        # TODO: Check no pending transactions in Redis first before resetting
+        BlockController.pending_transactions = False
 
         return self.blockchain_db.get_last_block()
 
@@ -94,7 +92,7 @@ class BlockController(object):
         To return the chain, status of pending transactions should be
         false else advise requesting node of the status '''
 
-        if self.pending_transactions:
+        if BlockController.pending_transactions:
             return None
 
         result_cursor = self.blockchain_db.get_chain()
@@ -116,41 +114,47 @@ class BlockController(object):
         -> None or list
         '''
 
-        nodes_list = NodeController().extract_nodes()
+        node_obj = NodeController()
+        nodes_list = node_obj.extract_nodes()
 
         # If there are no nodes to sync with e.g an init node, stop sync
         if not nodes_list:
-            return
+            return {'sync_error': 'No nodes to sync with'}
 
         response_data, max_len, endpoint = None, 0, ''
 
         endpoint = 'nodes'
         max_len = len(nodes_list)
-        response_data = NetworkController().request_data(
-            nodes_list, endpoint, max_len, update_chain)
 
-        # TODO: Investigate why init node's seed is being replaced by
-        # node 2 empty chain. Logical problem with this code?
+        response_data = NetworkController().request_data(
+            nodes_list, endpoint, max_len)
+
+        if len(response_data['error_nodes']) > 0:
+            return {'sync_error': response_data['error_nodes']}
+
+        else:
+            if len(response_data['payload']) > 0:
+                for node_url in response_data['payload']:
+                    node_obj.register_node(node_url)
+
+                nodes_list = node_obj.extract_nodes()
 
         if update_chain:
             endpoint = 'blocks'
             max_len = self.blockchain_db.get_chain(True)
+
             response_data = NetworkController().request_data(
-                nodes_list, endpoint, max_len, update_chain)
+                nodes_list, endpoint, max_len)
 
-        if len(response_data['error_nodes']) > 0:
-            return {'error_nodes': response_data['error_nodes']}
-
-        else:
-            if update_chain:
-                self.blockchain_db.delete_chain()
-
-                for block in response_data['payload']:
-                    self.blockchain_db.persist_new_block(block)
+            if len(response_data['error_nodes']) > 0:
+                return {'sync_error': response_data['error_nodes']}
 
             else:
-                for node_url in response_data['payload']:
-                    NodeController().register_node(node_url)
+                if len(response_data['payload']) > 0:
+                    self.blockchain_db.delete_chain()
+
+                    for block in response_data['payload']:
+                        self.blockchain_db.persist_new_block(block)
 
 
 class NodeController(object):
@@ -188,44 +192,54 @@ class NodeController(object):
         result_cursor = self.nodes_db.get_nodes()
         peer_nodes = [document['node_url'] for document in result_cursor]
 
-        return peer_nodes if len(peer_nodes) > 0 else []
+        return peer_nodes
 
 
 class NetworkController(object):
     ''' Manages peer node interation in the blockchain network '''
 
-    def request_data(self, node_url_list, endpoint, max_data_length,
-                     update_chain=False):
+    def request_data(self, node_url_list, endpoint, max_data_length):
 
         ''' Sends HTTP GET requests to peer nodes for either their node
         registry or blockchain data and returns the payload and a dict of
         nodes that did not respond with a 200, if any -> dict '''
 
         security = SecurityController()
-        error_nodes, payload, max_len = [], [], max_data_length
+        error_nodes, payload, mlen = [], [], max_data_length
 
-        REQUEST_HEADER = {
-                'key': security.blockchain_key(),
-                'url': NodeController().node_host
-            }
+        auth_header = {
+            'URL': NodeController().node_host,
+            'API_KEY': security.blockchain_key()
+        }
 
         for node_url in node_url_list:
-            response = requests.get(f'http://{node_url}/backend/{endpoint}',
-                                    headers=REQUEST_HEADER)
+            try:
+                response = requests.get(
+                    f'http://{node_url}/backend/{endpoint}',
+                    headers=auth_header)
+
+            except Exception:
+                error_nodes.append(
+                    {
+                        'message': f'Failed to connect to: {node_url}'
+                    }
+                )
+
+                continue
 
             if response.status_code == 200:
                 curr_len = len(response.json()['payload'])
                 curr_data = response.json()['payload']
 
-                if update_chain:
-                    if curr_len > max_len and \
+                if endpoint == 'blocks':
+                    if curr_len > mlen and \
                             security.validate_chain(curr_data):
-                        max_len = curr_len
+                        mlen = curr_len
                         payload = curr_data
 
-                elif not update_chain:
-                    if curr_len > max_len:
-                        max_len = curr_len
+                else:
+                    if curr_len > mlen:
+                        mlen = curr_len
                         payload = curr_data
 
             else:
@@ -266,8 +280,14 @@ class SecurityController(object):
         proof = 0
         while self.validate_proof(last_proof, proof) is False:
             proof += 1
-
         return proof
+
+    def blockchain_key(self):
+        ''' Returns the hashed blockchain key -> str '''
+
+        BLOCKCHAIN_ID = '87a56999-9a36-4359-a8c2-8217260f5a85'
+        key = f'{SECRET_KEY}-{BLOCKCHAIN_ID}'
+        return hashlib.sha256(key.encode()).hexdigest()
 
     def hash_block(self, block):
         '''
@@ -282,18 +302,15 @@ class SecurityController(object):
         block_uni = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_uni).hexdigest()
 
-    def blockchain_key(self):
-        ''' Returns SHA-256 hash of the blockchain key -> str '''
-
-        return hashlib.sha256(KEY.encode()).hexdigest()
-
-    def authorize_node(self, hashed_blockchain_key):
+    def authorize_node(self, header):
         '''
-        Verifies if the supplied hashed key in a node request correponds to
-        the verified blockchain key -> boolean
+        Authenticates and authorizes the requesting node to access our data
+        -> str
         '''
 
-        return hashed_blockchain_key == self.blockchain_key()
+        if header['API_KEY'] == self.blockchain_key() and \
+                header['URL'] != NodeController().node_host:
+            return header['URL']
 
     def validate_chain(self, chain):
         ''' Checks a blockchain's validity -> boolean '''

@@ -4,7 +4,7 @@ This module fetches and sets up app configurations
 
 import os
 
-KEY = os.getenv('KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 INIT_NODE_IP = os.getenv('INIT_NODE_IP')
 
 user = os.getenv('DB_USER')
