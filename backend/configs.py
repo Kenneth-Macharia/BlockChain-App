@@ -1,11 +1,13 @@
 '''
-This module fetches and sets up app configurations
+This module fetches and sets up app configurations.
 '''
 
 import os
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+TESTING = False
+
 INIT_NODE_IP = os.getenv('INIT_NODE_IP')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')

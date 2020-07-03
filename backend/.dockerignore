@@ -1,4 +1,8 @@
 __pycache__
+tests
 .DS_Store
 .condaauto
 local_run.sh
+.travis.yml
+Dockerfile
+test_runner.sh

@@ -2,13 +2,22 @@
 The flask app is built here.
 '''
 
+from os import getenv
 from flask import Flask
 from flask_restful import Api
 from .plugins import mongo
-from .app.resources import app_bp, BlockResource, BlockResources, NodeResources
+from .app.v1.blueprint import v1_bp
+from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
-def create_app(config_object='backend.configs'):
+# To either use test configs or app run configs when testing locally
+if getenv('TEST') == 'True':
+    app_configs = 'backend.tests.test_configs'
+else:
+    app_configs = 'backend.configs'
+
+
+def create_app(config_object=app_configs):
     '''
     This is the app factory where the app is initialized with its plugins
     and configs and all it's extensions (blueprints) recorded.
@@ -25,14 +34,14 @@ def create_app(config_object='backend.configs'):
 
     # Register all app components in the app context
     with app.app_context():
-        # add resources
-        api = Api(app_bp)
-        api.add_resource(BlockResource, '/block')
-        api.add_resource(BlockResources, '/blocks')
-        api.add_resource(NodeResources, '/nodes')
 
-        # Register app blueprints e.g app.register_blueprint(api_bp,
-        # url_prefix='/api')
-        app.register_blueprint(app_bp, url_prefix='/backend')
+        # add resources
+        api_v1 = Api(v1_bp)
+        api_v1.add_resource(BlockResource, '/block')
+        api_v1.add_resource(BlockResources, '/blocks')
+        api_v1.add_resource(NodeResources, '/nodes')
+
+        # Register app blueprints
+        app.register_blueprint(v1_bp, url_prefix='/backend/v1')
 
     return app

@@ -1,13 +1,10 @@
 '''
-This module contains the application blueprint and resources
+This module contains the app resources
 '''
 
-from flask import request, Blueprint
+from flask import request
 from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
-
-
-app_bp = Blueprint('app_bp', __name__)
 
 
 class BlockResource(Resource):

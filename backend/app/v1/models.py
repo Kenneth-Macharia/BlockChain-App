@@ -2,7 +2,7 @@
 This module contains the application models.
 '''
 
-from ..plugins import mongo
+from ...plugins import mongo
 
 
 class BlockModel(object):
