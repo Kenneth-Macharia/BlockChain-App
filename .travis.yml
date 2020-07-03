@@ -12,6 +12,6 @@ before_script:
   - sleep 15  # MongoDB does not immediately accept connections remedy
   - mongo mydb_test --eval 'db.createUser({user:"tester",pwd:"testing",roles:["readWrite", "dbAdmin"]});'
 script:
-- coverage run -m --source=app unittest && coverage report -m
+- coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
 - coveralls
