@@ -17,6 +17,10 @@ class TestNodeRegistry(TestCase):
         self.app = create_app().test_client()
         self.db = mongo.db
 
+        # Clear same db used locally for dev and testing
+        for collection in self.db.list_collection_names():
+            self.db.drop_collection(collection)
+
         self.init_node = os.getenv('INIT_NODE_IP')
 
         VALID_API_KEY = '0f2372ebbfee3231a9ddf5db4bf505ddbc5ad6d \

@@ -10,14 +10,7 @@ from .app.v1.blueprint import v1_bp
 from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
-# To either use test configs or app run configs when testing locally
-if getenv('TEST') == 'True':
-    app_configs = 'backend.tests.test_configs'
-else:
-    app_configs = 'backend.configs'
-
-
-def create_app(config_object=app_configs):
+def create_app(config_object=configs):
     '''
     This is the app factory where the app is initialized with its plugins
     and configs and all it's extensions (blueprints) recorded.
