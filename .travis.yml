@@ -2,15 +2,16 @@ language: python
 python:
 - '3.7'
 env: # Test an init node, then any other subsequent node
-- INIT_NODE_IP=""
-- INIT_NODE_IP = "localhost:5001
+- SECRET_KEY="2c635640-c8c4-4f0d-8790-e6008d8eecce"
+# - INIT_NODE_IP=""
+# - INIT_NODE_IP = "localhost:5001
 services:
 - mongodb
 install:
 - pip install -r backend/requirements.txt
-before_script:
-  - sleep 15  # Remedy for MongoDB does not immediately accept connections
-  - mongo mydb_test --eval 'db.createUser({user:"tester", pwd:"testing", roles:["readWrite", "dbAdmin"]});'
+# before_script:
+#   - sleep 15  Remedy for MongoDB does not immediately accept connections
+#   - mongo mydb_test --eval 'db.createUser({user:"tester", pwd:"testing", roles:["readWrite", "dbAdmin"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:

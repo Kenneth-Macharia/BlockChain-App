@@ -2,7 +2,6 @@
     blockchain start-up.
  '''
 
-import os
 from flask import json
 from unittest import TestCase
 from ... import create_app
@@ -18,41 +17,19 @@ class TestNodeRegistry(TestCase):
         self.db = mongo.db
 
         # Clear same db used locally for dev and testing
-        for collection in self.db.list_collection_names():
-            self.db.drop_collection(collection)
-
-        self.init_node = os.getenv('INIT_NODE_IP')
+        # for collection in self.db.list_collection_names():
+        #     self.db.drop_collection(collection)
 
         VALID_API_KEY = '0f2372ebbfee3231a9ddf5db4bf505ddbc5ad6d \
             90c665e856baf224a8960cfa8'
-        key = VALID_API_KEY.replace(' ', '')
+        self.key = VALID_API_KEY.replace(' ', '')
 
         # Test node details
         self.test_node_url = 'http://localhost:5000/backend/v1/nodes'
+
         self.test_node_headers = {
             'URL': 'localhost:5000',
-            'API_KEY': key,
-            "Content-Type": "application/json"
-        }
-
-        # init node details
-        self.init_node_header = {
-            'URL': 'localhost:5001',
-            'API_KEY': key,
-            "Content-Type": "application/json"
-        }
-
-        # other node details
-        self.other_node_header = {
-            'URL': 'localhost:5002',
-            'API_KEY': key,
-            "Content-Type": "application/json"
-        }
-
-        # other node incorrect details
-        self.other_node_wrong_header = {
-            'URL': 'localhost:5003',
-            'API_KEY': 'invalid api_key',
+            'API_KEY': self.key,
             "Content-Type": "application/json"
         }
 
@@ -62,16 +39,41 @@ class TestNodeRegistry(TestCase):
         for collection in self.db.list_collection_names():
             self.db.drop_collection(collection)
 
-    def test_nodes(self):
-        ''' Tests node states and interactions '''
+    def test_nodes_get(self):
+        ''' Tests /GET/nodes requests among peer nodes '''
 
-        # A node can't authroize itself to make a nodes GET request
+        # A node can't authorize its self
         response = self.app.get(
             self.test_node_url, headers=self.test_node_headers)
         self.assertEqual(response.status_code, 401)
 
-        # A node without a valid API_KEY in it's GET request header
-        # will not be authorized.
+        # A peer node must include a valid API_KEY in its request header
+        # to be authenticated by another peer node.
+        invalid_key_header = {
+            'URL': 'localhost:5001',
+            'API_KEY': 'invalid api_key',
+            "Content-Type": "application/json"
+        }
+
         response = self.app.get(
-            self.test_node_url, headers=self.other_node_wrong_header)
+            self.test_node_url, headers=invalid_key_header)
         self.assertEqual(response.status_code, 401)
+
+        # A peer node must include an API_KEY & it's url in it's request header
+        no_key_header = {
+            'URL': 'localhost:5002',
+            "Content-Type": "application/json"
+        }
+
+        response = self.app.get(
+            self.test_node_url, headers=no_key_header)
+        self.assertEqual(response.status_code, 400)
+
+        no_url_header = {
+            'API_KEY': self.key,
+            "Content-Type": "application/json"
+        }
+
+        response = self.app.get(
+            self.test_node_url, headers=no_url_header)
+        self.assertEqual(response.status_code, 400)

@@ -102,28 +102,37 @@ class BlockResources(Resource):
         ''' Exposes the protected get entire blockchain endpoint to ther peer
         nodes -> json '''
 
-        url = SecurityController().authorize_node(request.headers)
+        header = request.headers
 
-        if not url:
-            message = 'Request from an unauthorized node'
-            status_code = 401
+        if 'API_KEY' not in header.keys() or 'URL' not in header.keys():
+
+            message = 'Invalid Request'
+            status_code = 400
             payload = None
 
         else:
-            blocks = BlockController()
-            NodeController().register_node(url)
+            url = SecurityController().authorize_node(header)
 
-            result = blocks.extract_chain()
-
-            if result is None:
-                message = 'Chain not complete due to pending transactions'
-                status_code = 403
-                payload = []
+            if not url:
+                message = 'Unauthorized node'
+                status_code = 401
+                payload = None
 
             else:
-                message = 'Blockchain'
-                status_code = 200
-                payload = result
+                blocks = BlockController()
+                NodeController().register_node(url)
+
+                result = blocks.extract_chain()
+
+                if result is None:
+                    message = 'Chain not complete due to pending transactions'
+                    status_code = 403
+                    payload = []
+
+                else:
+                    message = 'Blockchain'
+                    status_code = 200
+                    payload = result
 
         response = {
             'message': message,
@@ -140,21 +149,30 @@ class NodeResources(Resource):
         ''' Exposes the protected get all registered peer nodes endpoint to
         other peer nodes -> json '''
 
-        url = SecurityController().authorize_node(request.headers)
+        header = request.headers
 
-        if not url:
-            message = 'Request from an unauthorized node'
-            status_code = 401
+        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
+
+            message = 'Invalid Request'
+            status_code = 400
             payload = None
 
         else:
-            BlockController()
-            NodeController().register_node(url)
+            url = SecurityController().authorize_node(header)
 
-            node_List = NodeController().extract_nodes()
-            message = 'Registered_nodes'
-            status_code = 200
-            payload = node_List
+            if not url:
+                message = 'Unauthorized node'
+                status_code = 401
+                payload = None
+
+            else:
+                BlockController()
+                NodeController().register_node(url)
+
+                node_List = NodeController().extract_nodes()
+                message = 'Registered_nodes'
+                status_code = 200
+                payload = node_List
 
         response = {
             'message': message,

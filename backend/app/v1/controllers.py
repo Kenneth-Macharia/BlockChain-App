@@ -308,9 +308,9 @@ class SecurityController(object):
         -> str
         '''
 
-        if header['API_KEY'] == self.blockchain_key() and \
-                header['URL'] != NodeController().node_host:
-            return header['URL']
+        if header['Api-Key'] == self.blockchain_key() and \
+                header['Url'] != NodeController().node_host:
+            return header['Url']
 
     def validate_chain(self, chain):
         ''' Checks a blockchain's validity -> boolean '''
