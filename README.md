@@ -1,8 +1,13 @@
 # Blockchain Demo App
+
+[![Build Status](https://travis-ci.org/Kenneth-Macharia/BlockChain-App.svg?branch=master)](https://travis-ci.org/Kenneth-Macharia/BlockChain-App)
+
 ## Description
+
 A minimalist demo application, simulating records deployed as a blockchain.
 
 ## The Components
+
 The app is made up of:
 
     1. A Node.js frontend service
@@ -13,4 +18,5 @@ The app is made up of:
 Each service will be packaged into a Docker image for deployment and orchestration.
 
 ## Author
+
 Kenneth Macharia
