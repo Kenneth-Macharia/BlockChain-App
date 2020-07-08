@@ -7,7 +7,7 @@ env: # Test an init node, then any other subsequent node
 services:
 - mongodb
 install:
-- pip install -r requirements.txt
+- pip install -r backend/requirements.txt
 before_script:
   - sleep 15  # MongoDB does not immediately accept connections remedy
   - mongo mydb_test --eval 'db.createUser({user:"tester",pwd:"testing",roles:["readWrite", "dbAdmin"]});'
