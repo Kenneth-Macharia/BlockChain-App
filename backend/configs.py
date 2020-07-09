@@ -11,8 +11,5 @@ user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')
 host = os.getenv('DB_HOST')
 
-# MONGO_URI = 'mongodb://%s:%s@%s/blockchain_db?authSource=admin' % (
-#     user, password, host)
-
 MONGO_URI = 'mongodb://%s:%s@%s/blockchain_db' % (
     user, password, host)
