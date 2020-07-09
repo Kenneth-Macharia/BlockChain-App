@@ -1,8 +1,6 @@
-'''
-The flask app is built here.
-'''
 
-from os import getenv
+''' The flask app is built here. '''
+
 from flask import Flask
 from flask_restful import Api
 from .plugins import mongo

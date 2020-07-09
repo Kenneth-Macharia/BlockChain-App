@@ -1,6 +1,4 @@
-'''
-This module contains the app resources
-'''
+''' This module contains the app resources '''
 
 from flask import request
 from flask_restful import Resource
@@ -8,6 +6,7 @@ from .controllers import SecurityController, NodeController, BlockController
 
 
 class BlockResource(Resource):
+
     ''' Manages a block resource '''
 
     def post(self):
@@ -96,6 +95,7 @@ class BlockResource(Resource):
 
 
 class BlockResources(Resource):
+
     ''' Manages block resources '''
 
     def get(self):
@@ -143,6 +143,7 @@ class BlockResources(Resource):
 
 
 class NodeResources(Resource):
+
     ''' Manages node resources '''
 
     def get(self):

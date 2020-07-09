@@ -1,6 +1,4 @@
-''' This test module validates the nodes' intialized states on
-    blockchain start-up.
- '''
+''' This module tests the nodes resources '''
 
 from flask import json
 from unittest import TestCase

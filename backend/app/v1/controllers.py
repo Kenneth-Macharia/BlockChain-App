@@ -22,6 +22,7 @@ from .models import BlockModel, NodeModel
 # TODO:Implement connection and updating Redis upon chain & node updates
 
 class BlockController(object):
+
     ''' Manages block forging and access to the blockchain '''
 
     pending_transactions = False
@@ -158,6 +159,7 @@ class BlockController(object):
 
 
 class NodeController(object):
+
     ''' Manages node registration and access to the node registry '''
 
     def __init__(self):
@@ -196,6 +198,7 @@ class NodeController(object):
 
 
 class NetworkController(object):
+
     ''' Manages peer node interation in the blockchain network '''
 
     def request_data(self, node_url_list, endpoint, max_data_length):
@@ -255,6 +258,7 @@ class NetworkController(object):
 
 
 class SecurityController(object):
+
     ''' Manages creation of node security features and authorization '''
 
     def validate_proof(self, last_proof, proof):
