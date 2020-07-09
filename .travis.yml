@@ -17,4 +17,4 @@ before_script:
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
-- .github/workflows/codacy-coverage-reporter
+- coveralls
