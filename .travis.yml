@@ -9,10 +9,5 @@ services:
 - mongodb
 install:
 - pip install -r backend/requirements.txt
-# before_script:
-  # - sleep 15  Remedy for MongoDB does not immediately accept connections
-  # - mongo mydb_test --eval 'db.createUser({user:"tester", pwd:"testing", roles:["readWrite", "dbAdmin"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
-after_success:
-- coveralls
