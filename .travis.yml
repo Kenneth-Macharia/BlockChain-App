@@ -16,3 +16,5 @@ before_script:
   - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite", "dbAdmin"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
+after_success:
+- .github/workflows/codacy-coverage-reporter
