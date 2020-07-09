@@ -1,8 +1,12 @@
 language: python
-python: 3.7
+python:
+- '3.7'
 env:
-- SECRET_KEY="2c635640-c8c4-4f0d-8790-e6008d8eecce"
-services: mongodb
+  global:
+    - SECRET_KEY="2c635640-c8c4-4f0d-8790-e6008d8eecce"
+    - DB_HOST="localhost"
+services:
+- mongodb
 install:
 - pip install -r backend/requirements.txt
 script:
