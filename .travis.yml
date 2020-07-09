@@ -5,13 +5,13 @@ env:
   global:
     - SECRET_KEY="2c635640-c8c4-4f0d-8790-e6008d8eecce"
     - DB_HOST="localhost"
-    - DB_USER="travis"
-    - DB_PASSWORD="test"
+    - DB_USER=""
+    - DB_PASSWORD=""
 services:
 - mongodb
 install:
 - pip install -r backend/requirements.txt
-before_script:
-  - mongo mydb_test --eval 'db.createUser({user:"travis", pwd:"test", roles:["readWrite", "dbAdmin"]});'
+# before_script:
+#   - mongo mydb_test --eval 'db.createUser({user:"travis", pwd:"test", roles:["readWrite"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
