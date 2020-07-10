@@ -104,7 +104,7 @@ class BlockResources(Resource):
 
         header = request.headers
 
-        if 'API_KEY' not in header.keys() or 'URL' not in header.keys():
+        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
 
             message = 'Invalid Request'
             status_code = 400
