@@ -1,4 +1,4 @@
-''' This module contains the app resources '''
+'''This module contains the app resources'''
 
 from flask import request
 from flask_restful import Resource
@@ -6,8 +6,7 @@ from .controllers import SecurityController, NodeController, BlockController
 
 
 class BlockResource(Resource):
-
-    ''' Manages a block resource '''
+    '''Manages a block resource'''
 
     def post(self):
         '''
@@ -95,12 +94,11 @@ class BlockResource(Resource):
 
 
 class BlockResources(Resource):
-
-    ''' Manages block resources '''
+    '''Manages block resources'''
 
     def get(self):
-        ''' Exposes the protected get entire blockchain endpoint to ther peer
-        nodes -> json '''
+        '''Exposes the protected get entire blockchain endpoint to ther peer
+        nodes -> json'''
 
         header = request.headers
 
@@ -143,12 +141,11 @@ class BlockResources(Resource):
 
 
 class NodeResources(Resource):
-
-    ''' Manages node resources '''
+    '''Manages node resources'''
 
     def get(self):
-        ''' Exposes the protected get all registered peer nodes endpoint to
-        other peer nodes -> json '''
+        '''Exposes the protected get all registered peer nodes endpoint to
+        other peer nodes -> json'''
 
         header = request.headers
 

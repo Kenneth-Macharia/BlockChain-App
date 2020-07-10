@@ -1,4 +1,4 @@
-''' This module is the app's entry apoint. '''
+'''This module is the app's entry apoint'''
 
 from . import create_app
 

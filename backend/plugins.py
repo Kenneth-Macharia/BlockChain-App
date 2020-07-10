@@ -1,6 +1,4 @@
-'''
-This module initializes all app plugins such databases, auth extensions etc
-'''
+'''This module initializes all app plugins such databases'''
 
 from flask_pymongo import PyMongo
 

@@ -1,4 +1,4 @@
-''' This module fetches and sets up app configurations. '''
+'''This module fetches and sets up app configurations'''
 
 import os
 
