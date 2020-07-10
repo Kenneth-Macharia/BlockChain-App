@@ -3,13 +3,13 @@ python:
 - '3.7'
 env:
   global:
-    - SECRET_KEY="2c635640-c8c4-4f0d-8790-e6008d8eecce"
+    - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
     - DB_PASSWORD="test"
-  # jobs:
 services:
 - mongodb
+- docker
 install:
 - pip install -r backend/requirements.txt
 before_script:
@@ -18,3 +18,8 @@ script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
 - coveralls
+deploy:
+  provider: script
+  script: bash docker_deploy
+  on:
+    branch: master

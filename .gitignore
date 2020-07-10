@@ -1,7 +1,6 @@
 orchestration
+execs
 __pycache__
 .DS_Store
 .condaauto
-local_run.sh
-test_runner.sh
-test_configs.py
+.coverage

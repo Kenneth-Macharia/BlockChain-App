@@ -1,5 +1,6 @@
 ''' This module tests the nodes resources '''
 
+from os import getenv
 from flask import json
 from unittest import TestCase
 from ... import create_app
@@ -14,13 +15,11 @@ class TestNodeRegistry(TestCase):
         self.app = create_app().test_client()
         self.db = mongo.db
 
-        # Clear same db used locally for dev and testing
-        # for collection in self.db.list_collection_names():
-        #     self.db.drop_collection(collection)
+        # TODO: REMOVE > Clear same db used locally for dev and testing
+        for collection in self.db.list_collection_names():
+            self.db.drop_collection(collection)
 
-        VALID_API_KEY = '0f2372ebbfee3231a9ddf5db4bf505ddbc5ad6d \
-            90c665e856baf224a8960cfa8'
-        self.key = VALID_API_KEY.replace(' ', '')
+        self.key = getenv('API_KEY')
 
         # Test node details
         self.test_node_url = 'http://localhost:5000/backend/v1/nodes'
