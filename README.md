@@ -6,7 +6,7 @@
 
 ## Description
 
-A demo application that implements a records blockchain.
+A demo application that implements a land records blockchain.
 
 ## The Components
 
