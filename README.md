@@ -6,7 +6,7 @@
 
 ## Description
 
-A demo application, simulating records deployed as a blockchain.
+A demo application that implements a records blockchain.
 
 ## The Components
 
