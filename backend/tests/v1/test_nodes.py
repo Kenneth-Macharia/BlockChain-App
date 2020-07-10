@@ -1,4 +1,4 @@
-''' This module tests the nodes resources '''
+'''This module tests the nodes resources'''
 
 from os import getenv
 from flask import json
@@ -10,7 +10,7 @@ from ...plugins import mongo
 class TestNodeRegistry(TestCase):
 
     def setUp(self):
-        '''  Setup before each test '''
+        '''Setup before each test'''
 
         self.app = create_app().test_client()
         self.db = mongo.db
@@ -31,13 +31,13 @@ class TestNodeRegistry(TestCase):
         }
 
     def tearDown(self):
-        ''' Wipes the test database after each test '''
+        '''Wipes the test database after each test'''
 
         for collection in self.db.list_collection_names():
             self.db.drop_collection(collection)
 
     def test_nodes_get(self):
-        ''' Tests /GET/nodes requests among peer nodes '''
+        '''Tests /GET/nodes requests among peer nodes'''
 
         # A node can't authorize its self
         response = self.app.get(

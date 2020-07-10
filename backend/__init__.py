@@ -1,5 +1,4 @@
-
-''' The flask app is built here. '''
+'''The flask app is built here'''
 
 from flask import Flask
 from flask_restful import Api
@@ -9,10 +8,8 @@ from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
 def create_app(config_object=configs):
-    '''
-    This is the app factory where the app is initialized with its plugins
-    and configs and all it's extensions (blueprints) recorded.
-    '''
+    '''This is the app factory where the app is initialized with its plugins
+    and configs and all it's extensions (blueprints) recorded'''
 
     # Initialize app with it's configurations
     app = Flask(__name__)

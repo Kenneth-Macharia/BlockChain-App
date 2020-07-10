@@ -5,7 +5,7 @@ This interfacing module:
         main database.
     3. Secures the blockchain and authenticates external requests for
         node data.
-    4. Syncs blockchain and node registry data with other peer nodes.
+    4. Syncs blockchain and node registry data with other peer nodes
 '''
 
 import json
@@ -22,13 +22,12 @@ from .models import BlockModel, NodeModel
 # TODO:Implement connection and updating Redis upon chain & node updates
 
 class BlockController(object):
-
-    ''' Manages block forging and access to the blockchain '''
+    '''Manages block forging and access to the blockchain'''
 
     pending_transactions = False
 
     def __init__(self):
-        ''' Initializes this node with a seed block '''
+        '''Initializes this node with a seed block'''
 
         self.blockchain_db = BlockModel()
 
@@ -89,9 +88,11 @@ class BlockController(object):
         return self.blockchain_db.get_last_block()
 
     def extract_chain(self):
-        ''' Fetches the blockchain cursor object, unpacks it and returns it.
+        '''
+        Fetches the blockchain cursor object, unpacks it and returns it.
         To return the chain, status of pending transactions should be
-        false else advise requesting node of the status '''
+        false else advise requesting node of the status
+        '''
 
         if BlockController.pending_transactions:
             return None
@@ -159,11 +160,10 @@ class BlockController(object):
 
 
 class NodeController(object):
-
-    ''' Manages node registration and access to the node registry '''
+    '''Manages node registration and access to the node registry'''
 
     def __init__(self):
-        ''' Initializes this node with a uuid and captures its host IP '''
+        '''Initializes this node with a uuid and captures its host IP'''
 
         self.nodes_db = NodeModel()
         self.node_id = str(uuid4()).replace('-', '')
@@ -198,14 +198,15 @@ class NodeController(object):
 
 
 class NetworkController(object):
-
-    ''' Manages peer node interation in the blockchain network '''
+    '''Manages peer node interation in the blockchain network'''
 
     def request_data(self, node_url_list, endpoint, max_data_length):
 
-        ''' Sends HTTP GET requests to peer nodes for either their node
+        '''
+        Sends HTTP GET requests to peer nodes for either their node
         registry or blockchain data and returns the payload and a dict of
-        nodes that did not respond with a 200, if any -> dict '''
+        nodes that did not respond with a 200, if any -> dict
+        '''
 
         security = SecurityController()
         error_nodes, payload, mlen = [], [], max_data_length
@@ -258,8 +259,7 @@ class NetworkController(object):
 
 
 class SecurityController(object):
-
-    ''' Manages creation of node security features and authorization '''
+    '''Manages creation of node security features and authorization'''
 
     def validate_proof(self, last_proof, proof):
         '''
@@ -287,7 +287,7 @@ class SecurityController(object):
         return proof
 
     def blockchain_key(self):
-        ''' Returns the hashed blockchain key -> str '''
+        '''Returns the hashed blockchain key -> str'''
 
         BLOCKCHAIN_ID = '87a56999-9a36-4359-a8c2-8217260f5a85'
         key = f'{SECRET_KEY}-{BLOCKCHAIN_ID}'
@@ -317,7 +317,7 @@ class SecurityController(object):
             return header['Url']
 
     def validate_chain(self, chain):
-        ''' Checks a blockchain's validity -> boolean '''
+        '''Checks a blockchain's validity -> boolean'''
 
         previous_block = chain[0]
         current_index = 1
