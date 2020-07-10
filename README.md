@@ -6,18 +6,26 @@
 
 ## Description
 
-A minimalist demo application, simulating records deployed as a blockchain.
+A demo application, simulating records deployed as a blockchain.
 
 ## The Components
 
-The app is made up of:
+The app is made up of the following micro-services:
 
-    1. A Node.js frontend service
-    2. A Redis cache service between the frontend and backend services
-    3. A Flask-Restful backend service
-    4. A MongoDB service
+    1. A Node.js frontend
+    2. A Redis cache between the frontend and backend services
+    3. A Flask-Restful backend
+    4. A Mongo database
 
-Each service will be packaged into a Docker image and deployed to an image registry through Travis CI, after automated tests pass.
+- Each service will be packaged into a Docker image and deployed to an image registry through Travis CI, after automated tests pass.
+- They can then be pulled into a cluster environment and orchestrated.
+
+## Implementation Scenario
+
+- Multiple hubs (containing a minimum 3-node cluster each) can be spun up to create a blockchain peer network.
+- Each hub will run the application on it's cluster and store it's own blockchain of the records.
+- Record/ block queries can be perfomed at each of the hubs as well as adding new blocks/ new records to the blockchain.
+- Each hub will automatically sync with the other peer hubs before forging a new block to gurantee the blockchain's validity.
 
 ## Author
 
