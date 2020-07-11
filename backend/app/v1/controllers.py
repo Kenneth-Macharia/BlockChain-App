@@ -15,7 +15,7 @@ from flask import request
 from time import time
 from uuid import uuid4
 from urllib.parse import urlparse
-from ...configs import key, init_node
+from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel
 
 
@@ -290,7 +290,7 @@ class SecurityController(object):
         '''Returns the hashed blockchain key -> str'''
 
         BLOCKCHAIN_ID = '87a56999-9a36-4359-a8c2-8217260f5a85'
-        key = f'{key}-{BLOCKCHAIN_ID}'
+        key = f'{secret_key}-{BLOCKCHAIN_ID}'
         return hashlib.sha256(key.encode()).hexdigest()
 
     def hash_block(self, block):
