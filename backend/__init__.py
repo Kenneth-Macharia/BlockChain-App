@@ -3,11 +3,20 @@
 from flask import Flask
 from flask_restful import Api
 from .plugins import mongo
+from . import configs
+from .tests.v1 import test_configs
 from .app.v1.blueprint import v1_bp
 from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
-def create_app(config_object=configs):
+# Use the dev/testing or production db
+if configs.testing:
+    app_configs = test_configs
+else:
+    app_configs = configs
+
+
+def create_app(config_object=app_configs):
     '''This is the app factory where the app is initialized with its plugins
     and configs and all it's extensions (blueprints) recorded'''
 
