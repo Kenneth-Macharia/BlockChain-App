@@ -290,7 +290,7 @@ class SecurityController(object):
         '''Returns the hashed blockchain key -> str'''
 
         BLOCKCHAIN_ID = '87a56999-9a36-4359-a8c2-8217260f5a85'
-        key = f'{SECRET_KEY}-{BLOCKCHAIN_ID}'
+        key = f'{key}-{BLOCKCHAIN_ID}'
         return hashlib.sha256(key.encode()).hexdigest()
 
     def hash_block(self, block):
