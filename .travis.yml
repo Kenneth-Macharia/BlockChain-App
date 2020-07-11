@@ -3,7 +3,7 @@ python:
 - '3.7'
 env:
   global:
-    - TEST="True"
+    - FLASK_ENV="development"
     - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
