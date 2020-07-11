@@ -13,7 +13,7 @@ services:
 install:
 - pip install -r backend/requirements.txt
 before_script:
-  - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite", "dbAdmin"]});'
+  - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWriteAnyDatabase"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
