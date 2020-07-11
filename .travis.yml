@@ -6,14 +6,16 @@ env:
     - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
-    - DB_PASSWORD="test"
+    - DB_PASSWORD="testing"
+    - MONGO_INITDB_ROOT_USERNAME="travis"
+    - MONGO_INITDB_ROOT_PASSWORD="testing"
 services:
 - mongodb
 - docker
 install:
 - pip install -r backend/requirements.txt
-before_script:
-  - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite", "root"]});'
+# before_script:
+#   - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite", "dbAdmin"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
