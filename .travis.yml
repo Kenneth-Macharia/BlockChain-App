@@ -6,7 +6,7 @@ env:
     - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
-    - DB_PASSWORD="testing"
+    - DB_PASSWORD="test"
 services:
 - mongodb
 - docker
