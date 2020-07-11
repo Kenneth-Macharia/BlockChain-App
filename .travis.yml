@@ -3,6 +3,7 @@ python:
 - '3.7'
 env:
   global:
+    - TEST="True"
     - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
@@ -13,7 +14,7 @@ services:
 install:
 - pip install -r backend/requirements.txt
 before_script:
-  - mongo blockchain_db --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite", "dbAdmin"]});'
+  - mongo test_db --eval 'db.createUser({user:"travis",pwd:"test", roles:["readWrite"]});'
 script:
 - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:

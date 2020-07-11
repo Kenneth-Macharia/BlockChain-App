@@ -15,7 +15,7 @@ from flask import request
 from time import time
 from uuid import uuid4
 from urllib.parse import urlparse
-from ...configs import SECRET_KEY, INIT_NODE_IP
+from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel
 
 
@@ -170,8 +170,8 @@ class NodeController(object):
         self.node_host = urlparse(request.host_url).netloc
         # {'198.162.1.2:5000'}
 
-        if INIT_NODE_IP != '':
-            self.register_node(INIT_NODE_IP)
+        if init_node != '':
+            self.register_node(init_node)
 
     def register_node(self, node_url):
         '''
@@ -290,7 +290,7 @@ class SecurityController(object):
         '''Returns the hashed blockchain key -> str'''
 
         BLOCKCHAIN_ID = '87a56999-9a36-4359-a8c2-8217260f5a85'
-        key = f'{SECRET_KEY}-{BLOCKCHAIN_ID}'
+        key = f'{secret_key}-{BLOCKCHAIN_ID}'
         return hashlib.sha256(key.encode()).hexdigest()
 
     def hash_block(self, block):
