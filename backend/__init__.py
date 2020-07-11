@@ -4,16 +4,15 @@ from flask import Flask
 from flask_restful import Api
 from .plugins import mongo
 from . import configs
-from .tests.v1 import test_configs
 from .app.v1.blueprint import v1_bp
 from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
-# Use the dev/testing or production db
-if configs.testing:
-    app_configs = test_configs
+# Use the dev/testing or production configs
+if configs.development:
+    app_configs = 'backend.tests.v1.test_configs'
 else:
-    app_configs = configs
+    app_configs = 'backend.configs'
 
 
 def create_app(config_object=app_configs):
