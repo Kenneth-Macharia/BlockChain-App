@@ -221,7 +221,7 @@ class NetworkController(object):
         for node_url in node_url_list:
             try:
                 response = requests.get(
-                    f'http://{node_url}/backend/{endpoint}',
+                    f'http://{node_url}/backend/v1/{endpoint}',
                     headers=auth_header)
 
             except Exception:
