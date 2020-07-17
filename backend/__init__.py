@@ -9,7 +9,7 @@ from .app.v1.resources import BlockResource, BlockResources, NodeResources
 
 
 # Use the dev/testing or production configs
-if configs.development:
+if configs.testing:
     app_configs = 'backend.tests.v1.test_configs'
 else:
     app_configs = 'backend.configs'

@@ -2,7 +2,7 @@
 
 import os
 
-development = os.getenv('FLASK_ENV')
+testing = os.getenv('TEST')
 init_node = os.getenv('INIT_NODE_IP')
 secret_key = os.getenv('SECRET_KEY')
 user = os.getenv('DB_USER')

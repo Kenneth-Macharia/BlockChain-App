@@ -164,7 +164,7 @@ class NodeResources(Resource):
                 payload = None
 
             else:
-                BlockController()
+                BlockController()   # Intializes Blockchain if first node
                 NodeController().register_node(url)
 
                 node_List = NodeController().extract_nodes()
