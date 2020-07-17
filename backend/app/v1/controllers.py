@@ -170,7 +170,9 @@ class NodeController(object):
         self.node_host = urlparse(request.host_url).netloc
         # {'198.162.1.2:5000'}
 
-        if init_node != '':
+        print(f'######## {init_node}')
+
+        if init_node:
             self.register_node(init_node)
 
     def register_node(self, node_url):
