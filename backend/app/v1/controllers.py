@@ -19,6 +19,7 @@ from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel
 
 
+# TODO:Implement period syncs to keep all node updated
 # TODO:Implement connection and updating Redis upon chain & node updates
 
 class BlockController(object):
@@ -170,8 +171,6 @@ class NodeController(object):
         self.node_host = urlparse(request.host_url).netloc
         # {'198.162.1.2:5000'}
 
-        print(f'######## {init_node}')
-
         if init_node:
             self.register_node(init_node)
 
@@ -253,7 +252,7 @@ class NetworkController(object):
                     {
                         'node': node_url,
                         'status_code': response.status_code,
-                        'message': response.json()['message']
+                        'message': response.json()['message']  # TODO
                     }
                 )
 
