@@ -5,6 +5,7 @@ import os
 testing = os.getenv('TEST')
 init_node = os.getenv('INIT_NODE_IP')
 secret_key = os.getenv('SECRET_KEY')
+api_key = os.getenv('API_KEY')
 user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')
 host = os.getenv('DB_HOST')
