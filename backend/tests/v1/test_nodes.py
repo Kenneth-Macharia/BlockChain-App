@@ -4,6 +4,7 @@ from flask import json
 from unittest import TestCase
 from ... import create_app
 from ...plugins import mongo
+from .test_configs import api_key
 
 
 class TestNodeRegistry(TestCase):
@@ -19,7 +20,7 @@ class TestNodeRegistry(TestCase):
 
         # Fetch test_client configs
         self.db = mongo.db
-        self.key = '0f2372ebbfee3231a9ddf5db4bf505ddbc5ad6d90c665e856baf224a8960cfa8'
+        self.key = api_key
 
         # Generate the test_client request data
         self.test_node_url = 'http://localhost:5000/backend/v1/nodes'

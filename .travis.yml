@@ -5,7 +5,6 @@ env:
   global:
     - FLASK_ENV="development"
     - TEST="testing"
-    - SECRET_KEY="$SECRET_KEY"
     - DB_HOST="localhost"
     - DB_USER="travis"
     - DB_PASSWORD="test"
