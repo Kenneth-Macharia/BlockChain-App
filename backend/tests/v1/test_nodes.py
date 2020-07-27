@@ -133,6 +133,8 @@ class TestNodeRegistry(TestCase):
         curr_obj = self.db.nodes_collection.find({}, {'_id': False})
         nodes_registered = [node['node_url'] for node in curr_obj]
 
-        self.assertEqual(len(nodes_registered), 2)
-        self.assertIn(init_node, nodes_registered)
         self.assertIn('localhost:5002', nodes_registered)
+
+        if init_node:
+            self.assertEqual(len(nodes_registered), 2)
+            self.assertIn(init_node, nodes_registered)
