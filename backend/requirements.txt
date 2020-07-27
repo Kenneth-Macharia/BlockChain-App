@@ -16,6 +16,7 @@ pycodestyle==2.6.0
 pymongo==3.10.1
 pytz==2020.1
 requests==2.23.0
+responses==0.10.15
 six==1.15.0
 urllib3==1.25.9
 Werkzeug==1.0.1
