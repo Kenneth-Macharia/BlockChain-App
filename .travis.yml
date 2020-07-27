@@ -8,6 +8,9 @@ env:
     - DB_HOST="localhost"
     - DB_USER="travis"
     - DB_PASSWORD="test"
+  jobs:
+    - INIT_NODE_IP=
+    - INIT_NODE_IP='localhost:5001'
 services:
 - mongodb
 - docker
