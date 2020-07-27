@@ -4,7 +4,7 @@ from flask import json
 from unittest import TestCase
 from ... import create_app
 from ...plugins import mongo
-from .test_configs import api_key
+from .test_configs import api_key, init_node
 
 
 class TestNodeRegistry(TestCase):
@@ -86,8 +86,9 @@ class TestNodeRegistry(TestCase):
             self.test_node_url, headers=correct_headers)
         self.assertEqual(response.status_code, 200)
 
-    def test_nodes_states(self):
-        '''Tests node registry states after /GET/nodes'''
+    def test_init_nodes_states(self):
+        '''Tests node registry states after /GET/nodes and assumes test
+        node is the INIT_NODE'''
 
         # An authenticated node making a node registry request will
         # be registered automatically
@@ -110,3 +111,28 @@ class TestNodeRegistry(TestCase):
 
         self.assertEqual(len(nodes_registered), 1)
         self.assertIn('localhost:5001', nodes_registered)
+
+    def test_non_init_nodes_states(self):
+        '''Tests node registry states after /GET/nodes and assumes test
+        node is not the INIT_NODE'''
+
+        new_node_headers = {
+            'URL': 'localhost:5002',
+            'API_KEY': self.key,
+            "Content-Type": "application/json"
+        }
+
+        # Node registry before request
+        self.assertEqual(self.db.nodes_collection.count_documents({}), 0)
+
+        response = self.test_client.get(
+            self.test_node_url, headers=new_node_headers)
+        self.assertEqual(response.status_code, 200)
+
+        # Node registry state after request, requesting node + init_node
+        curr_obj = self.db.nodes_collection.find({}, {'_id': False})
+        nodes_registered = [node['node_url'] for node in curr_obj]
+
+        self.assertEqual(len(nodes_registered), 2)
+        self.assertIn(init_node, nodes_registered)
+        self.assertIn('localhost:5002', nodes_registered)
