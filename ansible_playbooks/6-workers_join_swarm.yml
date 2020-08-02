@@ -1,0 +1,5 @@
+---
+- hosts: tag_Ansible_swarm_worker
+  tasks:
+    - name: Add worker nodes to swarm
+      script: /aux_files/worker_join_src.sh

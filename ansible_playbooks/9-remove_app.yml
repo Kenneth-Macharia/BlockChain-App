@@ -1,0 +1,7 @@
+---
+- hosts: tag_Ansible_swarm_leader
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Remove app deployment from swarm cluster
+      shell: "docker stack rm blockchain"

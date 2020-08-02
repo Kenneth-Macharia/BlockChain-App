@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Copy orchestration file to swarm leader
+      shell: "scp aux_files/deploy_app_init.yml azureuser@13.94.251.58:/home/azureuser/"

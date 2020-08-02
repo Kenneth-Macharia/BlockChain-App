@@ -1,0 +1,5 @@
+---
+- hosts: tag_Ansible_swarm_manager
+  tasks:
+    - name: Add other manager nodes to swarm
+      script: ./aux_files/manager_join_src.sh

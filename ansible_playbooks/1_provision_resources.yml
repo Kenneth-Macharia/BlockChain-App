@@ -1,0 +1,249 @@
+---
+- name: Provision a blockchain hub's compute resources
+  hosts: localhost
+  vars:
+    ssh_key: "{{ lookup('env', 'AZURE_SSH_KEY') }}"
+  tasks:
+    - name: Fetch and persist azure ssh key
+      shell: source aux_files/ssh_key_script
+
+# ------------------------------- HUB 1 ------------------------------------
+## HUB1 COMMON RESOURCES ##
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: TestResourceGroup
+        location: westeurope
+
+    - name: Create network security group
+      azure_rm_securitygroup:
+        resource_group: TestResourceGroup
+        name: network_security_grp
+        rules:
+          - name: external_traffic_in
+            protocol: Tcp
+            destination_port_range: 80
+            access: Allow
+            priority: 100
+            direction: Inbound
+
+          - name: external_traffic_out
+            protocol: Tcp
+            destination_port_range: 80
+            access: Allow
+            priority: 105
+            direction: Outbound
+
+          - name: secure_external_traffic_in
+            protocol: Tcp
+            destination_port_range: 443
+            access: Allow
+            priority: 110
+            direction: Inbound
+
+          - name: secure_external_traffic_out
+            protocol: Tcp
+            destination_port_range: 443
+            access: Allow
+            priority: 115
+            direction: Outbound
+
+          - name: swarm_cluster_management_in
+            protocol: Tcp
+            destination_port_range: 2377
+            access: Allow
+            priority: 120
+            direction: Inbound
+
+          - name: swarm_cluster_management_out
+            protocol: Tcp
+            destination_port_range: 2377
+            access: Allow
+            priority: 130
+            direction: Outbound
+
+          - name: swarm_cluster_node_communication_tcp_in
+            protocol: Tcp
+            destination_port_range: 7946
+            access: Allow
+            priority: 135
+            direction: Inbound
+
+          - name: swarm_cluster_node_communication_tcp_out
+            protocol: Tcp
+            destination_port_range: 7946
+            access: Allow
+            priority: 140
+            direction: Outbound
+
+          - name: swarm_cluster_node_communication_udp_in
+            protocol: Udp
+            destination_port_range: 7946
+            access: Allow
+            priority: 145
+            direction: Inbound
+
+          - name: swarm_cluster_node_communication_udp_out
+            protocol: Udp
+            destination_port_range: 7946
+            access: Allow
+            priority: 150
+            direction: Outbound
+
+          - name: swarm_overlay_network_traffic_in
+            protocol: Tcp
+            destination_port_range: 4789
+            access: Allow
+            priority: 155
+            direction: Inbound
+
+          - name: swarm_overlay_network_traffic_out
+            protocol: Tcp
+            destination_port_range: 4789
+            access: Allow
+            priority: 160
+            direction: Outbound
+
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 165
+            direction: Inbound
+
+          - name: external_traffic_3
+            protocol: Tcp
+            destination_port_range: 8090
+            access: Allow
+            priority: 180
+            direction: Inbound
+
+          - name: external_traffic_out_3
+            protocol: Tcp
+            destination_port_range: 8090
+            access: Allow
+            priority: 185
+            direction: Outbound
+
+    - name: Create H1 virtual network
+      azure_rm_virtualnetwork:
+        resource_group: TestResourceGroup
+        name: hub1_vnet
+        address_prefixes: "10.0.0.0/16"
+
+    - name: Add H1 subnet
+      azure_rm_subnet:
+        resource_group: TestResourceGroup
+        name: hub1_vnet_subnet
+        address_prefix: "10.0.1.0/24"
+        virtual_network: hub1_vnet
+
+## HUB1 VM1 RESOURCES ##
+    - name: Create H1_VM1 public IP address
+      azure_rm_publicipaddress:
+        resource_group: TestResourceGroup
+        allocation_method: Static
+        name: hub1_VM1_public_ip
+
+    - name: Create H1_VM1 network interface card
+      azure_rm_networkinterface:
+        name: hub1_VM1_nic
+        resource_group: TestResourceGroup
+        virtual_network_name: hub1_vnet
+        subnet_name: hub1_vnet_subnet
+        security_group: network_security_grp
+        ip_configurations:
+          - name: ipconfig
+            public_ip_address_name: hub1_VM1_public_ip
+            primary: True
+
+    - name: Create H1_VM1
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM1
+        vm_size: Standard_B1s
+        admin_username: azureuser
+        ssh_password_enabled: false
+        network_interfaces: hub1_VM1_nic
+        tags: {"Ansible":"swarm_leader"}
+        ssh_public_keys:
+          - path: /home/azureuser/.ssh/authorized_keys
+            key_data: "{{ ssh_key }}"
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: '18.04-LTS'
+          version: latest
+
+## HUB1 VM2 RESOURCES ##
+    - name: Create H1_VM2 public IP address
+      azure_rm_publicipaddress:
+        resource_group: TestResourceGroup
+        allocation_method: Static
+        name: hub1_VM2_public_ip
+
+    - name: Create H1_VM2 network interface card
+      azure_rm_networkinterface:
+        name: hub1_VM2_nic
+        resource_group: TestResourceGroup
+        virtual_network_name: hub1_vnet
+        subnet_name: hub1_vnet_subnet
+        security_group: network_security_grp
+        ip_configurations:
+          - name: ipconfig
+            public_ip_address_name: hub1_VM2_public_ip
+            primary: True
+
+    - name: Create H1_VM2
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM2
+        vm_size: Standard_B1s
+        admin_username: azureuser
+        ssh_password_enabled: false
+        network_interfaces: hub1_VM2_nic
+        tags: {"Ansible":"swarm_manager"}
+        ssh_public_keys:
+          - path: /home/azureuser/.ssh/authorized_keys
+            key_data: "{{ ssh_key }}"
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: '18.04-LTS'
+          version: latest
+
+## HUB1 VM3 RESOURCES ##
+    - name: Create H1_VM3 public IP address
+      azure_rm_publicipaddress:
+        resource_group: TestResourceGroup
+        allocation_method: Static
+        name: hub1_VM3_public_ip
+
+    - name: Create H1_VM3 network interface card
+      azure_rm_networkinterface:
+        name: hub1_VM3_nic
+        resource_group: TestResourceGroup
+        virtual_network_name: hub1_vnet
+        subnet_name: hub1_vnet_subnet
+        security_group: network_security_grp
+        ip_configurations:
+          - name: ipconfig
+            public_ip_address_name: hub1_VM3_public_ip
+            primary: True
+
+    - name: Create H1_VM3
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM3
+        vm_size: Standard_B1s
+        admin_username: azureuser
+        ssh_password_enabled: false
+        network_interfaces: hub1_VM3_nic
+        tags: {"Ansible":"swarm_manager"}
+        ssh_public_keys:
+          - path: /home/azureuser/.ssh/authorized_keys
+            key_data: "{{ ssh_key }}"
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: '18.04-LTS'
+          version: latest

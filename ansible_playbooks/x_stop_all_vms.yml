@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Stop VM1
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM1
+        allocated: no
+
+    - name: Stop VM2
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM2
+        allocated: no
+
+    - name: Stop VM3
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup
+        name: hub1-VM3
+        allocated: no
