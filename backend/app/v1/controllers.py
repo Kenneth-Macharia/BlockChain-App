@@ -252,7 +252,7 @@ class NetworkController(object):
                     {
                         'node': node_url,
                         'status_code': response.status_code,
-                        'message': response.json()['message']  # TODO
+                        'message': response.json()['message']  # TODOif no msg?
                     }
                 )
 

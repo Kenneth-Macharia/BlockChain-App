@@ -1,0 +1,7 @@
+---
+- hosts: tag_Ansible_swarm_leader
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Deploy app to swarm cluster
+      shell: "docker stack deploy -c /home/azureuser/deploy_app_init.yml blockchain"

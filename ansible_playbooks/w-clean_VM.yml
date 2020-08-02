@@ -1,0 +1,8 @@
+# CAUTION: REMOVES ALL IMAGES, NETWORKS, CONTAINERS AND VOLUMES!
+---
+- hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Clean up the VM docker environments
+      shell: docker system prune -fa --volumes

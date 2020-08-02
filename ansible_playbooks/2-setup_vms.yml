@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Install Docker
+      shell: curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && usermod -aG docker azureuser

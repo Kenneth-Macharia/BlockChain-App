@@ -1,0 +1,15 @@
+---
+- name: Decommissions all Hub compute resources
+  hosts: localhost
+  tasks:
+    - name: Delete resource group and all its resources
+      azure_rm_resourcegroup:
+        name: TestResourceGroup
+        force_delete_nonempty: yes
+        state: absent
+
+    - name: Delete network watch group and all its resources
+      azure_rm_resourcegroup:
+        name: NetworkWatcherRG
+        force_delete_nonempty: yes
+        state: absent
