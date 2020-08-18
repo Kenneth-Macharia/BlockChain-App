@@ -1,3 +1,0 @@
-#!/bin/bash
-
-export AZURE_SSH_KEY=$( cat /Users/kenneth/.ssh/id_azure.pub )

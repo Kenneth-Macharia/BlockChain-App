@@ -49,7 +49,7 @@ class BlockModel(object):
     def block_exists(self, criteria):
         '''Finds the a block that meets the criteria list -> boolean'''
 
-        #TODO: Fix args # error ofr count_documents
+        # TODO: Fix args # error for count_documents
         return True if self.__db_conn.count_documents(
             {"transaction['plot_number']": {'$eq': criteria[0]}},
             {"transaction['seller_id']": {'$eq': criteria[1]}},
