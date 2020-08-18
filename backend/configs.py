@@ -6,9 +6,16 @@ testing = os.getenv('TEST')
 init_node = os.getenv('INIT_NODE_IP')
 secret_key = os.getenv('SECRET_KEY')
 api_key = os.getenv('API_KEY')
-user = os.getenv('DB_USER')
-password = os.getenv('DB_PASSWORD')
-host = os.getenv('DB_HOST')
+
+mhost = os.getenv('MONGO_DB_HOST')
+muser = os.getenv('MONGO_DB_USER')
+mpassword = os.getenv('MONGO_DB_PASSWORD')
 
 MONGO_URI = 'mongodb://%s:%s@%s/blockchain_db?authSource=admin' % (
-    user, password, host)
+    muser, mpassword, mhost)
+
+rhost = os.getenv('REDIS_DB_HOST')
+ruser = os.getenv('REDIS_DB_USER')
+rpassword = os.getenv('REDIS_DB_PASSWORD')
+
+REDIS_URL = 'redis://%s:%s@%s:6379/0' % (ruser, rpassword, rhost)
