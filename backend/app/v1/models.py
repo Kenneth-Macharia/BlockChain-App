@@ -1,10 +1,30 @@
 '''This module contains the application models'''
 
-from ...plugins import mongo
+from ...plugins import mongo, redis_client
+
+
+class BlockCacheModel(object):
+    '''Manages the blockchain data in the Redis cache'''
+
+    def __init__(self):
+        '''Initializes the redis cache model'''
+
+        self.__redis_conn = redis_client
+
+    def push_chain(self, key, block):
+        '''Pushes updated blockchain to redis cache'''
+
+        if self.__redis_conn.exists():
+            self.__redis_conn.delete('blockchain_cache')
+
+        for block in blocks:
+            self.__redis_conn.rpush('blockchain_cache', block)
+
+        self.__redis_conn.persist('blockchain_cache')
 
 
 class BlockModel(object):
-    '''Manages the block data in the blockchain'''
+    '''Manages the blockchain data in the mongoDB'''
 
     def __init__(self):
         '''Initializes a collection for block documents in the db'''
@@ -25,6 +45,15 @@ class BlockModel(object):
         '''Saves a new block to the database -> None'''
 
         self.__db_conn.insert_one(new_block)
+
+    def block_exists(self, criteria):
+        '''Finds the a block that meets the criteria list -> boolean'''
+
+        # TODO: Fix args # error for count_documents
+        return True if self.__db_conn.count_documents(
+            {"transaction['plot_number']": {'$eq': criteria[0]}},
+            {"transaction['seller_id']": {'$eq': criteria[1]}},
+            {"transaction['buyer_id']": {'$eq': criteria[2]}}) != 0 else False
 
     def get_last_block(self, index=False):
         '''Returns the last block in the chain or it's index, if param[index]

@@ -48,10 +48,10 @@ class BlockResource(Resource):
 
         values = request.get_json()
 
-        required = ['plot_number', 'size', 'location', 'county',
-                    'seller_id', 'buyer_id', 'amount', 'original_owner']
+        # TODO: validate input on front-end
+        # required = ['plot_number', 'size', 'location', 'county',
+        #             'seller_id', 'buyer_id', 'amount', 'original_owner']
 
-        # TODO: Check in front end
         # if not all(k in values for k in required):
         #     return "Missing values", 400
 
@@ -71,7 +71,7 @@ class BlockResource(Resource):
             }
         }
 
-        result = BlockController().create_block(
+        result = BlockController().forge_block(
             transaction=transaction)
 
         message, status_code, payload = '', 0, []
@@ -80,6 +80,11 @@ class BlockResource(Resource):
             message = 'Sync Failure'
             status_code = 403
             payload = result['sync_error']
+
+        elif 'validation_error' in result.keys():
+            message = 'transaction validation_error'
+            status_code = 400
+            payload = result['validation_error']
 
         else:
             message = 'Transaction recorded'

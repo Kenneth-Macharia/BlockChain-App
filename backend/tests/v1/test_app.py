@@ -188,7 +188,7 @@ class TestBlockChain(TestCase):
             # is not the init_node
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(res_payload), 1)
-            self.assertIn('Seed Block', res_payload[0]['transaction'])
+            self.assertIn('seed_block', res_payload[0]['transaction'])
             self.assertEqual(res_payload[0]['index'], 1)
         else:
             # Non-init node should have no blocks as blockchain was already

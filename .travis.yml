@@ -5,9 +5,9 @@ env:
   global:
     - FLASK_ENV="development"
     - TEST="testing"
-    - DB_HOST="localhost"
-    - DB_USER="travis"
-    - DB_PASSWORD="test"
+    - MONGO_DB_HOST="localhost"
+    - MONGO_DB_USER="travis"
+    - MONGO_DB_PASSWORD="test"
   jobs:
     - INIT_NODE_IP='localhost:5001'
     - INIT_NODE_IP=

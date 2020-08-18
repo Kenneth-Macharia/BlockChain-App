@@ -5,3 +5,5 @@
   tasks:
     - name: Install Docker
       shell: curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && usermod -aG docker azureuser
+
+# Check host security configs for runnign docker using the docker-bench-security tool: https://github.com/docker/docker-bench-security

@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask_restful import Api
-from .plugins import mongo
+from .plugins import mongo, redis_client
 from . import configs
 from .app.v1.blueprint import v1_bp
 from .app.v1.resources import BlockResource, BlockResources, NodeResources
@@ -27,6 +27,7 @@ def create_app(config_object=app_configs):
 
     # Initialize plugins
     mongo.init_app(app)
+    redis_client.init_app(app)
 
     # Register all app components in the app context
     with app.app_context():
