@@ -25,7 +25,7 @@ The app is made up of the following micro-services:
 - Multiple hubs (containing a minimum 3-node cluster each) can be spun up to create a blockchain peer network.
 - Each hub will run the application on it's cluster and store it's own blockchain of the records.
 - Record/ block queries can be perfomed at each of the hubs as well as adding new blocks/ new records to the blockchain.
-- Each hub will automatically sync with the other peer hubs before forging a new block to gurantee the blockchain's validity.
+- Each hub will automatically sync with the other peer hubs before forging a new block to guarantee the blockchain's validity.
 
 ## Author
 
