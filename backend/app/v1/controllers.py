@@ -28,10 +28,6 @@ class CacheController(object):
     def update_blockchain_cache(self, records):
         '''Serializes blockchain data before adding to redis cache'''
 
-        # TODO: Implement hashmap with select details to redis
-
-        print('****', records)
-
         for record in records:
             if record['index'] != 1:
                 data = {
