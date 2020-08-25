@@ -104,7 +104,7 @@ class BlockController(object):
         records = self.extract_chain()
         record_exist = False
 
-        if len(records) > 1:
+        if records and len(records) > 1:
             plt_no = transaction['plot_number']
             seller_id = transaction['seller_id']
             buyer_id = transaction['buyer_id']
