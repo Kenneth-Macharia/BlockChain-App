@@ -10,7 +10,7 @@ A demo application that implements land records as a blockchain.
 
 ## The Components
 
-The app is made up of the following micro-services:
+The app is made up of the following services:
 
     1. A Node.js frontend
     2. A Redis cache between the frontend and backend services
