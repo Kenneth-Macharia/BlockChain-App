@@ -1,5 +1,6 @@
 #TODO: Use non-root user to run the container
-# TODO: Scan image for vulnerabilities using during or after CI build
+#TODO: Scan image for vulnerabilities using during or after CI build
+#TODO: Implement container health checks
 
 FROM python:3.7.7-alpine3.11
 

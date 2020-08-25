@@ -30,7 +30,7 @@ services:
                 condition: on-failure
 
     blockchain_app_2:
-        build: ../../backend
+        build: ../backend
         image: kennethmacharia/blockchain-backend:latest
         ports:
             - 8091:5000
@@ -47,7 +47,7 @@ services:
             # Exclude in production
             PYTHONUNBUFFERED: 1
             FLASK_ENV: development
-
+            # Hide in production
             SECRET_KEY: 2c635640-c8c4-4f0d-8790-e6008d8eecce
             INIT_NODE_IP: 192.168.100.208:8090
             MONGO_DB_HOST: mongo_db_2
