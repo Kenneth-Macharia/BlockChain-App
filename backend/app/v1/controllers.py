@@ -19,14 +19,13 @@ from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
-# TODO:Implement period syncs to keep all node updated
-
+# TODO:Implement period syncs to keep all node updated?
 
 class CacheController(object):
     ''' Manges transmission of blockchain data to from the redis cache'''
 
     def update_blockchain_cache(self, records):
-        '''Serializes blockchain data before adding to redis cache'''
+        '''Serializes blockchain data before adding to redis cache -> None'''
 
         for record in records:
             if record['index'] != 1:
@@ -78,9 +77,21 @@ class BlockController(object):
             no nodes to sync with (for init node): forge new block
             (new transaction or seed block)
         '''
+        
+        # Ensure similar block does not already exist
+        if isinstance(transaction, dict) and transaction.get('plot_number',
+                                                             False):
+            search_criteria = [
+                transaction['plot_number'],
+                transaction['seller_id'],
+                transaction['buyer_id']
+            ]
 
+            if self.blockchain_db.block_exists(search_criteria):
+                return {'validation_error': 'Transaction already exist'}
+
+        # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
-
         if sync_result and index is None:
             # BlockController.pending_transactions = True
 
@@ -89,6 +100,7 @@ class BlockController(object):
 
             return sync_result
 
+        # Forge block and add it to our blockchain
         security = SecurityController()
         last_block = self.blockchain_db.get_last_block()
 
@@ -100,30 +112,9 @@ class BlockController(object):
             'previous_hash': previous_hash or security.hash_block(last_block)
         }
 
-        # TODO: No need to fetch all records for existance check
-        # records = self.extract_chain()
-        # record_exist = False
-
-        # TODO: Debug test failure for init_node
-        # if len(records) > 1:
-        #     plt_no = transaction['plot_number']
-        #     seller_id = transaction['seller_id']
-        #     buyer_id = transaction['buyer_id']
-
-        #     for item in records[1:]:
-        #         if item['transaction']['plot_number'] == plt_no and \
-        #                 item['transaction']['seller_id'] and \
-        #                 item['transaction']['buyer_id']:
-
-        #             record_exist = True
-        #             break
-
-        # if record_exist:
-        #     return {'validation_error': 'Transaction already exist'}
-
         self.blockchain_db.persist_new_block(block)
-        # TODO: Remove successful transaction details from Redis
 
+        # Update Redis cache
         # CacheController().update_blockchain_cache(self.extract_chain())
 
         # TODO: Check no pending transactions in Redis first before resetting

@@ -12,7 +12,7 @@ class BlockCacheModel(object):
         self.__redis_conn = redis_client
 
     def push_transaction(self, transaction_field, transaction_data):
-        '''Pushes updated blockchain transactions to redis cache'''
+        '''Pushes updated blockchain transactions to redis cache -> None'''
 
         if self.__redis_conn.hexists('trans-cache', transaction_field) == 0:
             self.__redis_conn.hset(
@@ -28,6 +28,20 @@ class BlockModel(object):
         '''Initializes a collection for block documents in the db'''
 
         self.__db_conn = mongo.db.blocks_collection
+
+    def block_exists(self, criteria):
+        '''Checks if a block in the chain matching the search criteria
+        list -> Boolean'''
+
+        query_result = self.__db_conn.find_one(
+            {"$and": [
+                {"transaction.plot_number": {'$eq': criteria[0]}},
+                {"transaction.seller_id": {'$eq': criteria[1]}},
+                {"transaction.buyer_id": {'$eq': criteria[2]}}
+            ]}
+        )
+
+        return True if query_result else False
 
     def get_chain(self, length=False):
         '''Returns the entire block_chain or it's length if param[length] is
