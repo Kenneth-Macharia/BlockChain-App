@@ -11,16 +11,14 @@ class BlockCacheModel(object):
 
         self.__redis_conn = redis_client
 
-    def push_chain(self, key, block):
-        '''Pushes updated blockchain to redis cache'''
+    def push_transaction(self, transaction_field, transaction_data):
+        '''Pushes updated blockchain transactions to redis cache'''
 
-        if self.__redis_conn.exists():
-            self.__redis_conn.delete('blockchain_cache')
+        if self.__redis_conn.hexists('trans-cache', transaction_field) == 0:
+            self.__redis_conn.hset(
+                'trans-cache', transaction_field, transaction_data)
 
-        for block in blocks:
-            self.__redis_conn.rpush('blockchain_cache', block)
-
-        self.__redis_conn.persist('blockchain_cache')
+        self.__redis_conn.persist(transaction_field)
 
 
 class BlockModel(object):
@@ -45,15 +43,6 @@ class BlockModel(object):
         '''Saves a new block to the database -> None'''
 
         self.__db_conn.insert_one(new_block)
-
-    def block_exists(self, criteria):
-        '''Finds the a block that meets the criteria list -> boolean'''
-
-        # TODO: Fix args # error for count_documents
-        return True if self.__db_conn.count_documents(
-            {"transaction['plot_number']": {'$eq': criteria[0]}},
-            {"transaction['seller_id']": {'$eq': criteria[1]}},
-            {"transaction['buyer_id']": {'$eq': criteria[2]}}) != 0 else False
 
     def get_last_block(self, index=False):
         '''Returns the last block in the chain or it's index, if param[index]

@@ -25,25 +25,22 @@ from .models import BlockModel, NodeModel, BlockCacheModel
 class CacheController(object):
     ''' Manges transmission of blockchain data to from the redis cache'''
 
-    def update_blockchain_cache(self):
+    def update_blockchain_cache(self, records):
         '''Serializes blockchain data before adding to redis cache'''
 
-        # TODO: Implement hashmap with select details to redis
-        blocks = []
+        for record in records:
+            if record['index'] != 1:
+                data = {
+                    'current_owner': record['transaction']['buyer_id'],
+                    'size': record['transaction']['size'],
+                    'location': record['transaction']['location'],
+                    'county': record['transaction']['county'],
+                    'original_owner': record['transaction']['original_owner'],
+                    'timestamp': record['timestamp']
+                    }
 
-        for block in BlockModel().get_chain():
-            blocks.append(
-                {
-                    'timestamp': blocks['timestamp'],
-                    'size': blocks['transaction']['size'],
-                    'location': blocks['transaction']['location'],
-                    'county': blocks['transaction']['county'],
-                    'current_owner': blocks['transaction']['buyer_id'],
-                    'original_owner': blocks['transaction']['original_owner']
-                }
-            )
-
-        BlockCacheModel().push_chain(blocks)
+                BlockCacheModel().push_transaction(
+                    record['transaction']['plot_number'], json.dumps(data))
 
 
 class BlockController(object):
@@ -59,7 +56,7 @@ class BlockController(object):
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
-                             transaction={'seed_block': 'True'})
+                             transaction=['seed_block'])
 
     def forge_block(self, proof=None, previous_hash=None,
                     index=None, transaction={}):
@@ -85,7 +82,7 @@ class BlockController(object):
         sync_result = self.sync(update_chain=True)
 
         if sync_result and index is None:
-            BlockController.pending_transactions = True
+            # BlockController.pending_transactions = True
 
             # TODO: Leave transactions in Redis until successful sync
             # TODO: Timed re-sync for prior failed syncs
@@ -103,25 +100,34 @@ class BlockController(object):
             'previous_hash': previous_hash or security.hash_block(last_block)
         }
 
-        if not transaction.get('seed_block', None):
-            plt_no = transaction.get('plot_number', None)
-            seller_id = transaction.get('seller_id', None)
-            buyer_id = transaction.get('buyer_id', None)
+        # TODO: No need to fetch all records for existance check
+        # records = self.extract_chain()
+        # record_exist = False
 
-            print(plt_no, seller_id, buyer_id)
+        # TODO: Debug test failure for init_node
+        # if len(records) > 1:
+        #     plt_no = transaction['plot_number']
+        #     seller_id = transaction['seller_id']
+        #     buyer_id = transaction['buyer_id']
 
-            if self.blockchain_db.block_exists(
-                    [plt_no, seller_id, buyer_id]):
+        #     for item in records[1:]:
+        #         if item['transaction']['plot_number'] == plt_no and \
+        #                 item['transaction']['seller_id'] and \
+        #                 item['transaction']['buyer_id']:
 
-                return {'validation_error': 'transaction already exist'}
+        #             record_exist = True
+        #             break
+
+        # if record_exist:
+        #     return {'validation_error': 'Transaction already exist'}
 
         self.blockchain_db.persist_new_block(block)
         # TODO: Remove successful transaction details from Redis
 
-        # CacheController().update_blockchain_cache()
+        # CacheController().update_blockchain_cache(self.extract_chain())
 
         # TODO: Check no pending transactions in Redis first before resetting
-        BlockController.pending_transactions = False
+        # BlockController.pending_transactions = False
 
         return self.blockchain_db.get_last_block()
 
@@ -289,7 +295,7 @@ class NetworkController(object):
                     {
                         'node': node_url,
                         'status_code': response.status_code,
-                        'message': response.json()['message']  # TODOif no msg?
+                        'message': response.reason
                     }
                 )
 

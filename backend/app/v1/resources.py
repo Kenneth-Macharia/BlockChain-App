@@ -77,12 +77,12 @@ class BlockResource(Resource):
         message, status_code, payload = '', 0, []
 
         if 'sync_error' in result.keys():
-            message = 'Sync Failure'
+            message = 'Sync Error'
             status_code = 403
             payload = result['sync_error']
 
         elif 'validation_error' in result.keys():
-            message = 'transaction validation_error'
+            message = 'Validation Error'
             status_code = 400
             payload = result['validation_error']
 
