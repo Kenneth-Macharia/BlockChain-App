@@ -307,7 +307,6 @@ class TestBlockChain(TestCase):
             #  If test client or mock server is no the init node,
             # block forging on test client should fail because the
             # init node is not live thus not reacheable for sync
-
             self.assertEqual(response.status_code, 403)
 
         else:
@@ -320,6 +319,15 @@ class TestBlockChain(TestCase):
                           ['plot_number'])
             self.assertEqual(20466890, res_payload['transaction']
                              ['transfer_fee']['sender'])
+
+            # Test forging of duplicate blocks is not possible
+            response = test_client.post(
+                self.test_block_url, content_type='application/json',
+                data=json.dumps(self.new_block))
+
+            self.assertEqual(response.status_code, 400)
+            res_payload = json.loads(response.data)['payload']
+            self.assertIn('Transaction already exist', res_payload)
 
         # Shut down mock server
         mock_node_server.shutdown_server()
