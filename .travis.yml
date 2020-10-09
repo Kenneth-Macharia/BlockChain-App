@@ -3,7 +3,6 @@ python:
 - '3.7'
 env:
   global:
-    - FLASK_ENV="development"
     - TEST="testing"
     - MONGO_DB_HOST="localhost"
     - MONGO_DB_USER="travis"
