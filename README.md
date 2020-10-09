@@ -14,9 +14,15 @@
 
 The application is made up of the following container services:
 
-    1. A Node.js frontend which renders the UI views and can be used to link the applcation to other record keeping application via APIs.
-    2. A Redis cache between the frontend and backend services, which will offer fast record look-ups as well as a queue for transaction persisting to the main Database.
-    3. A Flask-Restful backend which secures the blockchain and co-ordinates data flow between the front and back end and across the peer network.
+    1. A Node.js frontend which renders the UI views and can be used to link
+     the applcation to other record keeping application via APIs.
+
+    2. A Redis cache between the frontend and backend services, which will
+     offer fast record look-ups as well as a queue for transaction persisting to the main Database.
+
+    3. A Flask-Restful backend which secures the blockchain and co-ordinates
+     data flow between the front and back end and across the peer network.
+
     4. A MongoDB database: the main persistance storage.
 
 - Each service will be packaged into a Docker image and deployed to an image registry through Travis CI, after automated tests pass.
