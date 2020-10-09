@@ -77,7 +77,7 @@ class BlockController(object):
             no nodes to sync with (for init node): forge new block
             (new transaction or seed block)
         '''
-        
+
         # Ensure similar block does not already exist
         if isinstance(transaction, dict) and transaction.get('plot_number',
                                                              False):
@@ -115,7 +115,7 @@ class BlockController(object):
         self.blockchain_db.persist_new_block(block)
 
         # Update Redis cache
-        # CacheController().update_blockchain_cache(self.extract_chain())
+        CacheController().update_blockchain_cache(self.extract_chain())
 
         # TODO: Check no pending transactions in Redis first before resetting
         # BlockController.pending_transactions = False
