@@ -13,6 +13,7 @@ env:
     - INIT_NODE_IP=
 services:
 - mongodb
+- redis
 - docker
 install:
 - pip install -r backend/requirements.txt
