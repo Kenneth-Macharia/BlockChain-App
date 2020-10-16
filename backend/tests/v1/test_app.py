@@ -15,6 +15,16 @@ base_url = 'http://localhost:5000/backend/v1'
 db = mongo.db
 mock_node_server1 = MockServer(5003)
 mock_node_server2 = MockServer(5004)
+new_transaction = {
+    "plot_number": "plt89567209",
+    "size": "0.25 acres",
+    "location": "Kangemi",
+    "county": "Nairobi",
+    "seller_id": 24647567,
+    "buyer_id": 20466890,
+    "amount": 1500000,
+    "original_owner": "True"
+}
 
 
 class TestNodeAuth(TestCase):
@@ -168,17 +178,6 @@ class TestBlockChain(TestCase):
         self.test_block_url = f'{base_url}/block'
         self.test_blockchain_url = f'{base_url}/blocks'
 
-        self.new_block = {
-            "plot_number": "plt89567209",
-            "size": "0.25 acres",
-            "location": "Kangemi",
-            "county": "Nairobi",
-            "seller_id": 24647567,
-            "buyer_id": 20466890,
-            "amount": 1500000,
-            "original_owner": "True"
-        }
-
     def tearDown(self):
         '''Wipes the test database after each test'''
 
@@ -226,7 +225,7 @@ class TestBlockChain(TestCase):
         response = test_client.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(self.new_block)
+            data=json.dumps(new_transaction)
         )
 
         self.assertEqual(response.status_code, 403)
@@ -253,7 +252,7 @@ class TestBlockChain(TestCase):
         response = test_client.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(self.new_block)
+            data=json.dumps(new_transaction)
         )
 
         self.assertEqual(response.status_code, 403)
@@ -306,7 +305,7 @@ class TestBlockChain(TestCase):
         response = test_client.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(self.new_block)
+            data=json.dumps(new_transaction)
         )
 
         if init_node:
@@ -328,7 +327,7 @@ class TestBlockChain(TestCase):
             # Test forging of duplicate blocks is not possible
             response = test_client.post(
                 self.test_block_url, content_type='application/json',
-                data=json.dumps(self.new_block))
+                data=json.dumps(new_transaction))
 
             self.assertEqual(response.status_code, 400)
             res_payload = json.loads(response.data)['payload']
@@ -423,7 +422,7 @@ class TestBlockChain(TestCase):
     #     response = test_client.post(
     #         self.test_block_url,
     #         content_type='application/json',
-    #         data=json.dumps(self.new_block)
+    #         data=json.dumps(new_transaction)
     #     )
 
     #     # Ensure test client has 3 block (the one its forging above plus
@@ -481,21 +480,11 @@ class TestRedisCache(TestCase):
         '''Setup before each test'''
 
         self.test_block_url = f'{base_url}/block'
-        self.new_block = {
-                "plot_number": "plt344567209",
-                "size": "0.5 acres",
-                "location": "Kikuyu",
-                "county": "Kiambu",
-                "seller_id": 18647567,
-                "buyer_id": 28976890,
-                "amount": 800000,
-                "original_owner": "False"
-            }
 
     def tearDown(self):
         '''Wipes the test cache after each test'''
 
-        redis_client.expire('trans-cache', 0)
+        # redis_client.expire('trans-cache', 0)
 
         for collection in db.list_collection_names():
             db.drop_collection(collection)
@@ -533,7 +522,7 @@ class TestRedisCache(TestCase):
         response = test_client.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(self.new_block)
+            data=json.dumps(new_transaction)
         )
 
         if not init_node:
@@ -542,9 +531,9 @@ class TestRedisCache(TestCase):
             # Confirm cache has been updated with the new blockchain
             self.assertEqual(1, redis_client.hlen('trans-cache'))
             cached_record = json.loads(redis_client.hget('trans-cache',
-                                       self.new_block["plot_number"]))
+                                       new_transaction["plot_number"]))
             self.assertEqual(cached_record['current_owner'],
-                             self.new_block['buyer_id'])
+                             new_transaction['buyer_id'])
 
         # Shut down the mock servers
         mock_node_server1.shutdown_server()
