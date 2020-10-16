@@ -9,4 +9,3 @@ ssh_key_script.sh
 worker_join_script.sh
 orchestrate
 node_modules
-startapp
