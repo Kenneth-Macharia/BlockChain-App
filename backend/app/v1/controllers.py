@@ -19,13 +19,11 @@ from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
-# TODO:Implement period syncs to keep all node updated?
-
 class CacheController(object):
     ''' Manges transmission of blockchain data to from the redis cache'''
 
     def update_blockchain_cache(self, records):
-        '''Serializes blockchain data before adding to redis cache -> None'''
+        '''Formats blockchain data before adding to redis cache -> None'''
 
         for record in records:
             if record['index'] != 1:
@@ -40,6 +38,21 @@ class CacheController(object):
 
                 BlockCacheModel().push_transaction(
                     record['transaction']['plot_number'], json.dumps(data))
+
+    def fetch_new_transactions(self):
+        '''Gets new transactions to forge in to blocks from Redis queue -> '''
+
+        # TODO: Check if there is a new item in the redis list and read it
+        # if present
+        
+
+        # TODO: Prepare transaction and pass it to BlockController for forging
+
+        # TODO: Get feedback that forging was successfull so as to pop
+        # transaction from Redis, otherwise leave it until forge
+        # is successfull.
+
+        # TODO: Timed re-sync for prior failed syncs
 
 
 class BlockController(object):
@@ -78,25 +91,22 @@ class BlockController(object):
             (new transaction or seed block)
         '''
 
-        # Ensure similar block does not already exist
-        if isinstance(transaction, dict) and transaction.get('plot_number',
-                                                             False):
-            search_criteria = [
-                transaction['plot_number'],
-                transaction['seller_id'],
-                transaction['buyer_id']
-            ]
+        # *** TO IMPLEMENT IN FRONTEND *** (Unique transaction check)
+        # if isinstance(transaction, dict) and transaction.get('plot_number',
+        #                                                      False):
+        #     search_criteria = [
+        #         transaction['plot_number'],
+        #         transaction['seller_id'],
+        #         transaction['buyer_id']
+        #     ]
 
-            if self.blockchain_db.block_exists(search_criteria):
-                return {'validation_error': 'Transaction already exist'}
+        #     if self.blockchain_db.block_exists(search_criteria):
+        #         return {'validation_error': 'Transaction already exist'}
 
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
         if sync_result and index is None:
             # BlockController.pending_transactions = True
-
-            # TODO: Leave transactions in Redis until successful sync
-            # TODO: Timed re-sync for prior failed syncs
 
             return sync_result
 

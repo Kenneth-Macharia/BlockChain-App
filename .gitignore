@@ -8,3 +8,4 @@ manager_join_script.sh
 ssh_key_script.sh
 worker_join_script.sh
 orchestrate
+node_modules
