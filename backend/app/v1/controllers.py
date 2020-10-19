@@ -100,17 +100,17 @@ class BlockController(object):
             (new transaction or seed block)
         '''
 
-        # *** TO IMPLEMENT IN FRONTEND *** (Unique transaction check)
-        # if isinstance(transaction, dict) and transaction.get('plot_number',
-        #                                                      False):
-        #     search_criteria = [
-        #         transaction['plot_number'],
-        #         transaction['seller_id'],
-        #         transaction['buyer_id']
-        #     ]
+        # * TO IMPLEMENT IN FRONTEND * (Unique transaction check)
+        if isinstance(transaction, dict) and transaction.get('plot_number',
+                                                             False):
+            search_criteria = [
+                transaction['plot_number'],
+                transaction['seller_id'],
+                transaction['buyer_id']
+            ]
 
-        #     if self.blockchain_db.block_exists(search_criteria):
-        #         return {'validation_error': 'Transaction already exist'}
+            if self.blockchain_db.block_exists(search_criteria):
+                return {'validation_error': 'Transaction already exist'}
 
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
