@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const redis = require('redis');
+const redisHost = process.env.REDIS_DB_HOST;
+const redisUser = process.env.REDIS_DB_USER;
 const redisPassword = process.env.REDIS_DB_PASSWORD;
 
 // Create Redis Client
-let redisClient = redis.createClient();
-redisClient.auth(redisPassword);
+let redisClient = redis.createClient({
+  host: redisHost,
+  user: redisUser,
+  password: redisPassword
+});
 
 redisClient.on('connect', () => {
   console.log('Connected to Redis...');
@@ -18,15 +23,28 @@ router.get('/', (req, res) => {
 
 // Add transaction
 router.post('/add', (req, res) => {
-  let pltNum = req.body.p_num;
-  let transaction = [
-    req.body.size, req.body.county, req.body.location, req.body.b_name, req.body.b_id, req.body.b_tel, req.body.s_name, req.body.s_id, req.body.s_tel, req.body.sale_val, req.body.trans_cost]
 
-  redisClient.rpush(pltNum, transaction, (err, result) => {
+  let transaction = {
+    'plot_num': req.body.p_num,
+    'size': req.body.size,
+    'county': req.body.county,
+    'location': req.body.location,
+    'buyer_name': req.body.b_name,
+    'buyer_id': req.body.b_id,
+    'buyer_tel': req.body.b_tel,
+    'seller_name': req.body.s_name,
+    'seller_id': req.body.s_id,
+    'seller_tel': req.body.s_tel,
+    'value': req.body.sale_val,
+    'transaction_cost': req.body.trans_cost
+  }
+
+  redisClient.rpush('records_queue', JSON.stringify(transaction), (
+    err, result) => {
       err ? console.log(err) : console.log(result)  //Change to user input
     });
 
-  redisClient.persist(pltNum);
+  redisClient.persist('records_queue');
   res.redirect('/');
 });
 
@@ -34,19 +52,19 @@ router.post('/add', (req, res) => {
 router.post('/find', (req, res) => {
   let pltSearch = req.body.query;
 
-  redisClient.hget('trans-cache', pltSearch, (err, r) => {
+  redisClient.hget('records_cache', pltSearch, (err, result) => {
 
-    if(!r){
+    if(!result){
+      console.log(err);
       res.render('index', {
         error: 'Record does not exist'
       });
     } else {
-
-      result = JSON.parse(r);
+      res_obj = JSON.parse(result);
       result.plot_no = pltSearch;
 
       res.render('index', {
-        records: result
+        records: res_obj
       });
     }
   });
