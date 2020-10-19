@@ -3,7 +3,8 @@ __pycache__
 .condaauto
 .coverage
 test_runner
-run_app
+run_back
+run_front
 manager_join_script.sh
 ssh_key_script.sh
 worker_join_script.sh
