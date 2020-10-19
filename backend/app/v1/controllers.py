@@ -11,6 +11,7 @@ This interfacing module:
 import json
 import requests
 import hashlib
+from threading import Timer
 from flask import request
 from time import time
 from uuid import uuid4
@@ -19,13 +20,18 @@ from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
-# TODO:Implement period syncs to keep all node updated?
-
 class CacheController(object):
     ''' Manges transmission of blockchain data to from the redis cache'''
 
+    def __init__(self):
+        '''Initializes the cache controller'''
+
+        self.cache_db = BlockCacheModel()
+        self.cache_listener = Timer(60.0, self.fetch_new_transactions)
+        self.cache_listener.start()
+
     def update_blockchain_cache(self, records):
-        '''Serializes blockchain data before adding to redis cache -> None'''
+        '''Formats blockchain data before adding to redis cache -> None'''
 
         for record in records:
             if record['index'] != 1:
@@ -38,8 +44,23 @@ class CacheController(object):
                     'timestamp': record['timestamp']
                     }
 
-                BlockCacheModel().push_transaction(
+                self.cache_db.push_transaction(
                     record['transaction']['plot_number'], json.dumps(data))
+
+    def fetch_new_transactions(self):
+        '''Gets new transactions to forge in to blocks from Redis queue -> '''
+
+        # TODO: Check if there is a new item in the redis list
+        transactions = []
+        transactions.append(self.cache_db.pop_transactions())
+
+        print(transactions)
+
+        # TODO: Prepare transaction and pass it to BlockController for forging
+
+        # TODO: If forging fails, lpush the tranasction back into the cache
+
+        # TODO: Timed er-forge for prior failed forges
 
 
 class BlockController(object):
@@ -51,6 +72,7 @@ class BlockController(object):
         '''Initializes this node with a seed block'''
 
         self.blockchain_db = BlockModel()
+        self.cache_controller = CacheController()
 
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
@@ -78,7 +100,7 @@ class BlockController(object):
             (new transaction or seed block)
         '''
 
-        # Ensure similar block does not already exist
+        # * TO IMPLEMENT IN FRONTEND * (Unique transaction check)
         if isinstance(transaction, dict) and transaction.get('plot_number',
                                                              False):
             search_criteria = [
@@ -94,9 +116,6 @@ class BlockController(object):
         sync_result = self.sync(update_chain=True)
         if sync_result and index is None:
             # BlockController.pending_transactions = True
-
-            # TODO: Leave transactions in Redis until successful sync
-            # TODO: Timed re-sync for prior failed syncs
 
             return sync_result
 
@@ -115,7 +134,7 @@ class BlockController(object):
         self.blockchain_db.persist_new_block(block)
 
         # Update Redis cache
-        CacheController().update_blockchain_cache(self.extract_chain())
+        self.cache_controller.update_blockchain_cache(self.extract_chain())
 
         # TODO: Check no pending transactions in Redis first before resetting
         # BlockController.pending_transactions = False

@@ -181,7 +181,7 @@ class TestBlockChain(TestCase):
     def tearDown(self):
         '''Wipes the test database after each test'''
 
-        redis_client.expire('trans-cache', 0)
+        redis_client.expire('records_cache', 0)
 
         for collection in db.list_collection_names():
             db.drop_collection(collection)
@@ -484,7 +484,7 @@ class TestRedisCache(TestCase):
     def tearDown(self):
         '''Wipes the test cache after each test'''
 
-        # redis_client.expire('trans-cache', 0)
+        # redis_client.expire('records_cache', 0)
 
         for collection in db.list_collection_names():
             db.drop_collection(collection)
@@ -493,7 +493,7 @@ class TestRedisCache(TestCase):
         '''Test the state of the cache before and after blockchain updates'''
 
         # Ensure the cache is empty
-        self.assertEqual(0, redis_client.hlen('trans-cache'))
+        self.assertEqual(0, redis_client.hlen('records_cache'))
 
         # Forge a block
         mock_node_headers = {
@@ -529,8 +529,8 @@ class TestRedisCache(TestCase):
             self.assertEqual(response.status_code, 201)
 
             # Confirm cache has been updated with the new blockchain
-            self.assertEqual(1, redis_client.hlen('trans-cache'))
-            cached_record = json.loads(redis_client.hget('trans-cache',
+            self.assertEqual(1, redis_client.hlen('records_cache'))
+            cached_record = json.loads(redis_client.hget('records_cache',
                                        new_transaction["plot_number"]))
             self.assertEqual(cached_record['current_owner'],
                              new_transaction['buyer_id'])

@@ -14,11 +14,16 @@ class BlockCacheModel(object):
     def push_transaction(self, transaction_field, transaction_data):
         '''Pushes updated blockchain transactions to redis cache -> None'''
 
-        if self.__redis_conn.hexists('trans-cache', transaction_field) == 0:
+        if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
             self.__redis_conn.hset(
-                'trans-cache', transaction_field, transaction_data)
+                'records_cache', transaction_field, transaction_data)
 
         self.__redis_conn.persist(transaction_field)
+
+    def pop_transactions(self):
+        '''Returns a popped transaction from the Redis cache -> Dict'''
+
+        return self.__redis_conn.blpop('records_cache', 5)
 
 
 class BlockModel(object):
