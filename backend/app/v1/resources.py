@@ -48,13 +48,6 @@ class BlockResource(Resource):
 
         values = request.get_json()
 
-        # TODO: validate input on front-end
-        # required = ['plot_number', 'size', 'location', 'county',
-        #             'seller_id', 'buyer_id', 'amount', 'original_owner']
-
-        # if not all(k in values for k in required):
-        #     return "Missing values", 400
-
         transaction = {
             'plot_number': values['plot_number'],
             'size': values['size'],
