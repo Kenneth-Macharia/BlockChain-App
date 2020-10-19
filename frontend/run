@@ -1,5 +1,0 @@
-#!/bin/bash
-
-export REDIS_DB_PASSWORD=8fea17c9-8b3c-4c1a-abd0-0f17f7e415ec
-
-npm start

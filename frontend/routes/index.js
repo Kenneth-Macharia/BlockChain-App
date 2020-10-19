@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const redis = require('redis');
+const redisHost = process.env.REDIS_DB_HOST;
+const redisUser = process.env.REDIS_DB_USER;
 const redisPassword = process.env.REDIS_DB_PASSWORD;
 
 // Create Redis Client
-let redisClient = redis.createClient();
-redisClient.auth(redisPassword);
+let redisClient = redis.createClient({
+  host: redisHost,
+  user: redisUser,
+  password: redisPassword
+});
 
 redisClient.on('connect', () => {
   console.log('Connected to Redis...');
