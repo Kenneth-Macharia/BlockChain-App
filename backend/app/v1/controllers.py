@@ -27,8 +27,8 @@ class CacheController(object):
         '''Initializes the cache controller'''
 
         self.cache_db = BlockCacheModel()
-        self.cache_listener = Timer(60.0, self.fetch_new_transactions)
-        self.cache_listener.start()
+        # self.cache_listener = Timer(60.0, self.fetch_new_transactions)
+        # self.cache_listener.start()
 
     def update_blockchain_cache(self, records):
         '''Formats blockchain data before adding to redis cache -> None'''

@@ -5,7 +5,8 @@ from flask_restful import Api
 from .plugins import mongo, redis_client
 from . import configs
 from .app.v1.blueprint import v1_bp
-from .app.v1.resources import BlockResource, BlockResources, NodeResources
+from .app.v1.resources import (SystemResource, BlockResources,
+                               NodeResources, BlockResource)
 
 
 # Use the dev/testing or production configs
@@ -34,6 +35,7 @@ def create_app(config_object=app_configs):
 
         # add resources
         api_v1 = Api(v1_bp)
+        api_v1.add_resource(SystemResource, '/init')
         api_v1.add_resource(BlockResource, '/block')
         api_v1.add_resource(BlockResources, '/blocks')
         api_v1.add_resource(NodeResources, '/nodes')
