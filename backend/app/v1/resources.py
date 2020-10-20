@@ -99,8 +99,6 @@ class SystemResource(Resource):
         '''Initializes the backend'''
 
         BlockController()
-        NodeController()
-
         return {'message': 'Backend initialized'}, 201
 
 
