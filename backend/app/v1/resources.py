@@ -5,6 +5,105 @@ from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
 
 
+class NodeResources(Resource):
+    '''Manages node resources'''
+
+    def get(self):
+        '''Exposes the protected get all registered peer nodes endpoint to
+        other peer nodes -> json'''
+
+        header = request.headers
+
+        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
+
+            message = 'Invalid Request'
+            status_code = 400
+            payload = None
+
+        else:
+            url = SecurityController().authorize_node(header)
+
+            if not url:
+                message = 'Unauthorized node'
+                status_code = 401
+                payload = None
+
+            else:
+                BlockController()   # Intializes Blockchain if first node
+                NodeController().register_node(url)
+
+                node_List = NodeController().extract_nodes()
+                message = 'Registered_nodes'
+                status_code = 200
+                payload = node_List
+
+        response = {
+            'message': message,
+            'payload': payload
+        }
+
+        return response, status_code
+
+
+class BlockResources(Resource):
+    '''Manages block resources'''
+
+    def get(self):
+        '''Exposes the protected get entire blockchain endpoint to ther peer
+        nodes -> json'''
+
+        header = request.headers
+
+        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
+
+            message = 'Invalid Request'
+            status_code = 400
+            payload = None
+
+        else:
+            url = SecurityController().authorize_node(header)
+
+            if not url:
+                message = 'Unauthorized node'
+                status_code = 401
+                payload = None
+
+            else:
+                blocks = BlockController()
+                NodeController().register_node(url)
+
+                result = blocks.extract_chain()
+
+                if result is None:
+                    message = 'Chain not complete due to pending transactions'
+                    status_code = 403
+                    payload = []
+
+                else:
+                    message = 'Blockchain'
+                    status_code = 200
+                    payload = result
+
+        response = {
+            'message': message,
+            'payload': payload
+        }
+
+        return response, status_code
+
+
+class SystemResource(Resource):
+    '''Manages sytem checks requests by the frontend'''
+
+    def post(self):
+        '''Initializes the backend'''
+
+        BlockController()
+        NodeController()
+
+        return {'message': 'Backend initialized'}, 201
+
+
 class BlockResource(Resource):
     '''Manages a block resource'''
 
@@ -83,93 +182,6 @@ class BlockResource(Resource):
             message = 'Transaction recorded'
             status_code = 201
             payload = result
-
-        response = {
-            'message': message,
-            'payload': payload
-        }
-
-        return response, status_code
-
-
-class BlockResources(Resource):
-    '''Manages block resources'''
-
-    def get(self):
-        '''Exposes the protected get entire blockchain endpoint to ther peer
-        nodes -> json'''
-
-        header = request.headers
-
-        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
-
-            message = 'Invalid Request'
-            status_code = 400
-            payload = None
-
-        else:
-            url = SecurityController().authorize_node(header)
-
-            if not url:
-                message = 'Unauthorized node'
-                status_code = 401
-                payload = None
-
-            else:
-                blocks = BlockController()
-                NodeController().register_node(url)
-
-                result = blocks.extract_chain()
-
-                if result is None:
-                    message = 'Chain not complete due to pending transactions'
-                    status_code = 403
-                    payload = []
-
-                else:
-                    message = 'Blockchain'
-                    status_code = 200
-                    payload = result
-
-        response = {
-            'message': message,
-            'payload': payload
-        }
-
-        return response, status_code
-
-
-class NodeResources(Resource):
-    '''Manages node resources'''
-
-    def get(self):
-        '''Exposes the protected get all registered peer nodes endpoint to
-        other peer nodes -> json'''
-
-        header = request.headers
-
-        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
-
-            message = 'Invalid Request'
-            status_code = 400
-            payload = None
-
-        else:
-            url = SecurityController().authorize_node(header)
-
-            if not url:
-                message = 'Unauthorized node'
-                status_code = 401
-                payload = None
-
-            else:
-                BlockController()   # Intializes Blockchain if first node
-                NodeController().register_node(url)
-
-                node_List = NodeController().extract_nodes()
-                message = 'Registered_nodes'
-                status_code = 200
-                payload = node_List
 
         response = {
             'message': message,

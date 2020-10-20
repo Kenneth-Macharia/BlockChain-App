@@ -9,13 +9,12 @@ from ... import create_app
 from .mock_server import MockServer
 
 
-# Set up globals
-test_client = create_app().test_client()
-base_url = 'http://localhost:5000/backend/v1'
-db = mongo.db
-mock_node_server1 = MockServer(5003)
-mock_node_server2 = MockServer(5004)
-new_transaction = {
+# -------- GLOBALS ---------
+TEST_CLIENT = create_app().test_client()
+DB = mongo.db
+MOCK_NODE1 = MockServer(5001)
+BASE_URL = 'http://localhost:5000/backend/v1'
+NEW_TRANSACTION = {
     "plot_number": "plt89567209",
     "size": "0.25 acres",
     "location": "Kangemi",
@@ -27,14 +26,33 @@ new_transaction = {
 }
 
 
+# ------ HELPER FUNCTIONS ------
+def start_mockserver():
+    MOCK_NODE1.start()
+
+
+def stop_mockserver():
+    MOCK_NODE1.shutdown_server()
+
+
+def reset_test_datastores():
+    # MongoDB
+    for collection in DB.list_collection_names():
+        DB.drop_collection(collection)
+
+    # Redis
+    redis_client.expire('records_cache', 0)
+
+
+# ------- TEST CASES ----------
 class TestNodeAuth(TestCase):
     '''Tests inter-peer nodes authenticate to gain access to their data'''
 
     def setUp(self):
         '''Setup before each test'''
 
-        self.test_auth_nodes = f'{base_url}/nodes'
-        self.test_auth_blocks = f'{base_url}/blocks'
+        self.test_auth_nodes = f'{BASE_URL}/nodes'
+        self.test_auth_blocks = f'{BASE_URL}/blocks'
 
         self.test_node_headers = {
             'URL': 'localhost:5000',
@@ -45,18 +63,17 @@ class TestNodeAuth(TestCase):
     def tearDown(self):
         '''Wipes the test database after each test'''
 
-        for collection in db.list_collection_names():
-            db.drop_collection(collection)
+        reset_test_datastores()
 
     def test_nodes_access(self):
         '''Tests node access rules for /GET/nodes & /GET/blocks requests'''
 
         # A node can't authorize its self
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_nodes, headers=self.test_node_headers)
         self.assertEqual(response.status_code, 401)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_blocks, headers=self.test_node_headers)
         self.assertEqual(response.status_code, 401)
 
@@ -68,11 +85,11 @@ class TestNodeAuth(TestCase):
             "Content-Type": "application/json"
         }
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_nodes, headers=invalid_key_header)
         self.assertEqual(response.status_code, 401)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_blocks, headers=invalid_key_header)
         self.assertEqual(response.status_code, 401)
 
@@ -82,11 +99,11 @@ class TestNodeAuth(TestCase):
             "Content-Type": "application/json"
         }
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_nodes, headers=no_key_header)
         self.assertEqual(response.status_code, 400)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_blocks, headers=no_key_header)
         self.assertEqual(response.status_code, 400)
 
@@ -95,11 +112,11 @@ class TestNodeAuth(TestCase):
             "Content-Type": "application/json"
         }
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_nodes, headers=no_url_header)
         self.assertEqual(response.status_code, 400)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_blocks, headers=no_url_header)
         self.assertEqual(response.status_code, 400)
 
@@ -110,11 +127,11 @@ class TestNodeAuth(TestCase):
             "Content-Type": "application/json"
         }
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_auth_nodes, headers=correct_headers)
         self.assertEqual(response.status_code, 200)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
                 self.test_auth_blocks, headers=correct_headers)
         self.assertEqual(response.status_code, 200)
 
@@ -127,13 +144,12 @@ class TestNodeRegistry(TestCase):
     def setUp(self):
         '''Setup before each test'''
 
-        self.test_node_url = f'{base_url}/nodes'
+        self.test_node_url = f'{BASE_URL}/nodes'
 
     def tearDown(self):
         '''Wipes the test database after each test'''
 
-        for collection in db.list_collection_names():
-            db.drop_collection(collection)
+        reset_test_datastores()
 
     def test_node_states(self):
         '''Tests node registry states before and after /GET/nodes,
@@ -148,9 +164,9 @@ class TestNodeRegistry(TestCase):
         }
 
         # Node registry state before request
-        self.assertEqual(db.nodes_collection.count_documents({}), 0)
+        self.assertEqual(DB.nodes_collection.count_documents({}), 0)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_node_url, headers=new_node_headers)
         self.assertEqual(response.status_code, 200)
 
@@ -175,16 +191,13 @@ class TestBlockChain(TestCase):
         '''Setup before each test'''
 
         # set up test endpoints
-        self.test_block_url = f'{base_url}/block'
-        self.test_blockchain_url = f'{base_url}/blocks'
+        self.test_block_url = f'{BASE_URL}/block'
+        self.test_blockchain_url = f'{BASE_URL}/blocks'
 
     def tearDown(self):
         '''Wipes the test database after each test'''
 
-        redis_client.expire('records_cache', 0)
-
-        for collection in db.list_collection_names():
-            db.drop_collection(collection)
+        reset_test_datastores()
 
     def test_blockchain_states(self):
         '''Tests the blockchain states before and after /GET/blocks'''
@@ -196,9 +209,9 @@ class TestBlockChain(TestCase):
         }
 
         # Blockchain should not have any blocks before request
-        self.assertEqual(db.blocks_collection.count_documents({}), 0)
+        self.assertEqual(DB.blocks_collection.count_documents({}), 0)
 
-        response = test_client.get(
+        response = TEST_CLIENT.get(
             self.test_blockchain_url, headers=new_node_headers)
 
         res_payload = json.loads(response.data)['payload']
@@ -222,10 +235,10 @@ class TestBlockChain(TestCase):
         '''Blocks can't be forged on unless there are atleast two peer
         nodes in the blockchain network.
         '''
-        response = test_client.post(
+        response = TEST_CLIENT.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(new_transaction)
+            data=json.dumps(NEW_TRANSACTION)
         )
 
         self.assertEqual(response.status_code, 403)
@@ -240,8 +253,8 @@ class TestBlockChain(TestCase):
         }
 
         # register a peer node
-        response = test_client.get(
-            f'{base_url}/nodes', headers=new_node_headers)
+        response = TEST_CLIENT.get(
+            f'{BASE_URL}/nodes', headers=new_node_headers)
 
         self.assertEqual(response.status_code, 200)
         res_payload = json.loads(response.data)['payload']
@@ -249,228 +262,115 @@ class TestBlockChain(TestCase):
 
         # Block forging on test client fails because it cannot sync with
         # the newly registered node 'localhost:5002' as it is not live.
-        response = test_client.post(
+        response = TEST_CLIENT.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(new_transaction)
+            data=json.dumps(NEW_TRANSACTION)
         )
 
         self.assertEqual(response.status_code, 403)
 
-    def test_block_forging_with_sync(self):
-        '''Tests successful block forging on the /POST/block endpoint'''
+    def test_block_forging_with_sync_data_replacement(self):
+        '''
+        Tests successful block forging on the /POST/block
+        endpoint including updating of node registry and blockchain
+        from peers.
 
-        # Start mock server1
-        mock_node_server1.start()
+        Test scenario:
+            INIT_NODE == Server1 (localhost:5003)
+            test_client (localhost:5000)
 
-        # Start mock server2
-        mock_node_server2.start()
+            initial Server1 node registry => None
+            initial Server1 => ['seed']
 
-        # Register mock node with test client (simulate a request sent from
-        # mock node to auto register it on test client localhost:5000)
-        mock_node_headers = {
-            'URL': 'localhost:5003',
-            'API_KEY': api_key,
-            "Content-Type": "application/json"
-        }
+            test_client node registry => ['Server1']
+            test_client blockchain => []
 
-        response = test_client.get(
-            f'{base_url}/nodes', headers=mock_node_headers)
+            Forge new_block on test_client
+            test_client blockchain => ['seed', 'new_block']
+        '''
 
-        self.assertEqual(response.status_code, 200)
-        res_payload = json.loads(response.data)['payload']
-        self.assertIn('localhost:5003', res_payload)
-
-        '''For test client to be able to forge a new block, it
-        must be able to sync its node registry and blockchain with
-        the registered mock node'''
-
-        # Add desired response from mock server for /GET/nodes
-        nodes_response_payload = {
-            "message": "Registered_nodes",
-            "payload": ['localhost:5000']
-        }
-        mock_node_server1.add_json_response(
-            '/backend/v1/nodes', nodes_response_payload)
-
-        # Add desired blockchain response from mock server for /GET/blocks
-        blocks_response_payload = {
-            "message": "Blockchain",
-            "payload": []
-        }
-        mock_node_server1.add_json_response(
-            '/backend/v1/blocks', blocks_response_payload)
-
-        # Forge new block on test client
-        response = test_client.post(
-            self.test_block_url,
-            content_type='application/json',
-            data=json.dumps(new_transaction)
-        )
+        # Start Mock servers to enable nodes sync while block forging
+        start_mockserver()
 
         if init_node:
-            #  If test client or mock server is no the init node,
-            # block forging on test client should fail because the
-            # init node is not live thus not reacheable for sync
-            self.assertEqual(response.status_code, 403)
+            server1_headers = {
+                'URL': 'localhost:5001',
+                'API_KEY': api_key,
+                "Content-Type": "application/json"
+            }
 
-        else:
-            # If either mock server or test client is the init node then
-            # sync will be successfull as both are live.
-            self.assertEqual(response.status_code, 201)
+            # test client's node registry
+            response = TEST_CLIENT.get(
+                f'{BASE_URL}/nodes', headers=server1_headers)
+
+            self.assertEqual(response.status_code, 200)
             res_payload = json.loads(response.data)['payload']
-            self.assertIn('plt89567209', res_payload['transaction']
-                          ['plot_number'])
-            self.assertEqual(20466890, res_payload['transaction']
-                             ['transfer_fee']['sender'])
+            self.assertEqual(1, len(res_payload))
+            self.assertIn('localhost:5001', res_payload)
+
+            # test client's blockchain
+            response = TEST_CLIENT.get(
+                f'{BASE_URL}/blocks', headers=server1_headers)
+
+            self.assertEqual(response.status_code, 200)
+            res_payload = json.loads(response.data)['payload']
+            self.assertEqual(0, len(res_payload))
+
+            # Add server1 node registry response
+            s1_nodes_response_payload = {
+                "message": "Registered_nodes",
+                "payload": []
+            }
+            MOCK_NODE1.add_json_response(
+                    '/backend/v1/nodes', s1_nodes_response_payload)
+
+            # Add server1 blockchain response
+            s1_blocks_response_payload = {
+                "message": "Blockchain",
+                "payload": [
+                    {
+                        "index": 1,
+                        "timestamp": 1602169193.1990635,
+                        "transaction": [
+                            "seed_block"
+                        ],
+                        "proof": 100,
+                        "previous_hash": 10
+                    }
+                ]
+            }
+            MOCK_NODE1.add_json_response(
+                '/backend/v1/blocks', s1_blocks_response_payload)
+
+            # Forge new block on test client
+            response = TEST_CLIENT.post(
+                self.test_block_url,
+                content_type='application/json',
+                data=json.dumps(NEW_TRANSACTION)
+            )
+
+            self.assertEqual(response.status_code, 201)
+
+            # Test inclusion of 'seed block from server1 on sync + new block
+            response = TEST_CLIENT.get(
+                f'{BASE_URL}/blocks', headers=server1_headers)
+
+            self.assertEqual(response.status_code, 200)
+            res_blockchain = json.loads(response.data)['payload']
+            self.assertEqual(2, len(res_blockchain))
+            self.assertIn('seed_block', res_blockchain[0]['transaction'])
+            self.assertIn('plt89567209', res_blockchain[1]
+                          ['transaction']['plot_number'])
 
             # Test forging of duplicate blocks is not possible
-            response = test_client.post(
+            response = TEST_CLIENT.post(
                 self.test_block_url, content_type='application/json',
-                data=json.dumps(new_transaction))
+                data=json.dumps(NEW_TRANSACTION))
 
             self.assertEqual(response.status_code, 400)
             res_payload = json.loads(response.data)['payload']
             self.assertIn('Transaction already exist', res_payload)
-
-    # def test_block_forging_with_sync_data_replacement(self):
-    #     '''Tests successful block forging on the /POST/block
-    #     endpoint including updating of node registry and blockchain
-    #     from peers'''
-
-    #     # Fetch test client's node registry (also registers server1
-    #     # with test client)
-    #     server1_headers = {
-    #         'URL': 'localhost:5003',
-    #         'API_KEY': api_key,
-    #         "Content-Type": "application/json"
-    #     }
-
-    #     response = test_client.get(
-    #         f'{base_url}/nodes', headers=server1_headers)
-
-    #     # Ensure test client only knows about server1 #
-    #     self.assertEqual(response.status_code, 200)
-    #     res_payload = json.loads(response.data)['payload']
-    #     self.assertIn('localhost:5003', res_payload)
-    #     self.assertNotIn('localhost:5004', res_payload)
-
-    #     # Add server1 node registry response
-    #     s1_nodes_response_payload = {
-    #         "message": "Registered_nodes",
-    #         "payload": ['localhost:5000', 'localhost:5003', 'localhost:5004']
-    #     }
-    #     mock_node_server1.add_json_response(
-    #         '/backend/v1/nodes', s1_nodes_response_payload)
-
-    #     # Add server1 blockchain response
-    #     s1_blocks_response_payload = {
-    #         "message": "Blockchain",
-    #         "payload": [
-    #             {
-    #                 "index": 1,
-    #                 "timestamp": 1602169193.1990635,
-    #                 "transaction": [
-    #                     "seed_block"
-    #                 ],
-    #                 "proof": 100,
-    #                 "previous_hash": 10
-    #             },
-    #             {
-    #                 "index": 2,
-    #                 "timestamp": 1602169217.505347,
-    #                 "transaction": {
-    #                     "plot_number": "plt624523479",
-    #                     "size": "1 acres",
-    #                     "location": "Othaya",
-    #                     "county": "Nyeri",
-    #                     "seller_id": 20647534,
-    #                     "buyer_id": 19976843,
-    #                     "transfer_amount": 970000,
-    #                     "original_owner": "True",
-    #                     "transfer_fee": {
-    #                         "sender": 19976843,
-    #                         "recipient": "5769da5212f149cdaad5e63803700d8a",
-    #                         "amount": 10000
-    #                     }
-    #                 },
-    #                 "proof": 35293,
-    #                 "previous_hash": "56e023e4050e119e57f887cc014cbcfd2613040e24d3fd2032c38beae2473e7f"
-    #             }
-    #         ]
-    #     }
-    #     mock_node_server1.add_json_response(
-    #         '/backend/v1/blocks', s1_blocks_response_payload)
-
-    #     # Add server2 node registry response
-    #     s2_nodes_response_payload = {
-    #         "message": "Registered_nodes",
-    #         "payload": ['localhost:5003', 'localhost:5004']
-    #     }
-    #     mock_node_server2.add_json_response(
-    #         '/backend/v1/nodes', s2_nodes_response_payload)
-
-    #     # Add server2 blockchain response
-    #     s2_blocks_response_payload = {
-    #         "message": "Blockchain",
-    #         "payload": []
-    #     }
-    #     mock_node_server2.add_json_response(
-    #         '/backend/v1/blocks', s2_blocks_response_payload)
-
-    #     # Forge new block on test client
-    #     response = test_client.post(
-    #         self.test_block_url,
-    #         content_type='application/json',
-    #         data=json.dumps(new_transaction)
-    #     )
-
-    #     # Ensure test client has 3 block (the one its forging above plus
-    #     # the two from server2)
-    #     if init_node:
-    #         # Init node localhost:5001 can't be reached
-    #         self.assertEqual(response.status_code, 403)
-    #         res_payload_post = json.loads(response.data)['payload']
-    #         self.assertIn(
-    #             'Failed to connect to: localhost:5001',
-    #             res_payload_post[0]['message'])
-
-    #     else:
-    #         # Succesfull block forging
-    #         self.assertEqual(response.status_code, 201)
-    #         res_payload_post = json.loads(response.data)['payload']
-    #         self.assertIn('plt89567209',
-    #                       res_payload_post['transaction']['plot_number'])
-
-    #         # Ensure test client has registered server 2 as well
-    #         # from server1's data during sync above #
-    #         response = test_client.get(
-    #             f'{base_url}/nodes', headers=server1_headers)
-
-    #         res_payload_nodes = json.loads(response.data)['payload']
-
-    #         self.assertEqual(response.status_code, 200)
-    #         self.assertIn('localhost:5004', res_payload_nodes)
-
-    #         # Ensure test client's blockchain has been updated with
-    #         # 3 the additional blocks from server2 #
-    #         server1_headers = {
-    #             'URL': 'localhost:5003',
-    #             'API_KEY': api_key,
-    #             "Content-Type": "application/json"
-    #         }
-
-    #         response = test_client.get(
-    #             f'{base_url}/blocks', headers=server1_headers)
-
-    #         res_payload_blocks = json.loads(response.data)['payload']
-
-    #         self.assertEqual(3, len(res_payload_blocks))
-    #         self.assertIn('seed_block', res_payload_blocks[0]['transaction'])
-    #         self.assertIn('plt624523479', res_payload_blocks[1]
-    #                       ['transaction']['plot_number'])
-    #         self.assertIn('plt89567209', res_payload_blocks[2]
-    #                       ['transaction']['plot_number'])
 
 
 class TestRedisCache(TestCase):
@@ -479,15 +379,13 @@ class TestRedisCache(TestCase):
     def setUp(self):
         '''Setup before each test'''
 
-        self.test_block_url = f'{base_url}/block'
+        self.test_block_url = f'{BASE_URL}/block'
 
     def tearDown(self):
         '''Wipes the test cache after each test'''
 
-        # redis_client.expire('records_cache', 0)
-
-        for collection in db.list_collection_names():
-            db.drop_collection(collection)
+        stop_mockserver()
+        reset_test_datastores()
 
     def test_cache_states(self):
         '''Test the state of the cache before and after blockchain updates'''
@@ -497,32 +395,32 @@ class TestRedisCache(TestCase):
 
         # Forge a block
         mock_node_headers = {
-            'URL': 'localhost:5003',
+            'URL': 'localhost:5001',
             'API_KEY': api_key,
             "Content-Type": "application/json"
         }
-        response = test_client.get(
-            f'{base_url}/nodes', headers=mock_node_headers)
+        response = TEST_CLIENT.get(
+            f'{BASE_URL}/nodes', headers=mock_node_headers)
         self.assertEqual(response.status_code, 200)
 
         nodes_response_payload = {
             "message": "Registered_nodes",
             "payload": ['localhost:5000']
         }
-        mock_node_server1.add_json_response(
+        MOCK_NODE1.add_json_response(
             '/backend/v1/nodes', nodes_response_payload)
 
         blocks_response_payload = {
             "message": "Blockchain",
             "payload": []
         }
-        mock_node_server1.add_json_response(
+        MOCK_NODE1.add_json_response(
             '/backend/v1/blocks', blocks_response_payload)
 
-        response = test_client.post(
+        response = TEST_CLIENT.post(
             self.test_block_url,
             content_type='application/json',
-            data=json.dumps(new_transaction)
+            data=json.dumps(NEW_TRANSACTION)
         )
 
         if not init_node:
@@ -531,10 +429,6 @@ class TestRedisCache(TestCase):
             # Confirm cache has been updated with the new blockchain
             self.assertEqual(1, redis_client.hlen('records_cache'))
             cached_record = json.loads(redis_client.hget('records_cache',
-                                       new_transaction["plot_number"]))
+                                       NEW_TRANSACTION["plot_number"]))
             self.assertEqual(cached_record['current_owner'],
-                             new_transaction['buyer_id'])
-
-        # Shut down the mock servers
-        mock_node_server1.shutdown_server()
-        mock_node_server2.shutdown_server()
+                             NEW_TRANSACTION['buyer_id'])
