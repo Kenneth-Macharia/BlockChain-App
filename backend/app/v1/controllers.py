@@ -27,8 +27,8 @@ class CacheController(object):
         '''Initializes the cache controller'''
 
         self.cache_db = BlockCacheModel()
-        # self.cache_listener = Timer(60.0, self.fetch_new_transactions)
-        # self.cache_listener.start()
+        self.cache_listener = Timer(60.0, self.fetch_new_transactions)
+        self.cache_listener.start()
 
     def update_blockchain_cache(self, records):
         '''Formats blockchain data before adding to redis cache -> None'''
@@ -72,12 +72,13 @@ class BlockController(object):
         '''Initializes this node with a seed block'''
 
         self.blockchain_db = BlockModel()
-        self.cache_controller = CacheController()
 
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
                              transaction=['seed_block'])
+
+        self.cache_controller = CacheController()
 
     def forge_block(self, proof=None, previous_hash=None,
                     index=None, transaction={}):
