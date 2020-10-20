@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
+const https = require('https');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -27,6 +28,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/add', indexRouter);
 app.use('/find', indexRouter);
+
+// Initialize the backend
+const req_data = {
+  hostname: 'localhost',
+  port: 8090,
+  path: '/backend/v1',
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'}
+}
+
+https.request(req_data, response => {
+  console.log(`statusCode: ${res.statusCode}`)
+
+  res.on('data', d => {
+    process.stdout.write(d);
+  })
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
