@@ -31,9 +31,9 @@ app.use('/find', indexRouter);
 
 // Initialize the backend
 const req_data = {
-  hostname: 'localhost',
-  port: 5000,
-  path: '/backend/v1',
+  hostname: 'backend_1',
+  port: 8090,
+  path: '/backend/v1/init',
   method: 'POST',
   headers: {'Content-Type': 'application/json'}
 }
