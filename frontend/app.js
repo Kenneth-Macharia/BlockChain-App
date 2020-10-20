@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
-const https = require('https');
+const request = require('request');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -46,18 +46,32 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize the backend
-const req_data = {
-  hostname: 'backend_1',
-  port: 5000,
-  path: '/backend/v1/init',
-  method: 'POST'
-}
-https.request(req_data, response => {
-  console.log(`statusCode: ${res.statusCode}`)
+// const req_data = {
+//   hostname: 'backend_1',
+//   port: 5000,
+//   path: '/backend/v1/init',
+//   method: 'POST'
+// }
+// http.request(req_data, response => {
+//   console.log(`statusCode: ${res.statusCode}`)
 
-  res.on('data', d => {
-    process.stdout.write(d);
-  })
+//   res.on('data', d => {
+//     process.stdout.write(d);
+//   })
+// });
+
+request.post(
+  'http://backend_1:5000/backend/v1/init',
+  {
+    json: true
+  },
+  (err, res, body) => {
+    if (err) {
+      return console.log(err);
+    }
+
+    console.log(`statusCode: ${res.statusCode}`)
+    console.log(res, body);
 });
 
 module.exports = app;
