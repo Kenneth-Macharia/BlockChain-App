@@ -3,7 +3,7 @@
 from ...plugins import mongo, redis_client
 
 
-class BlockCacheModel(object):
+class BlockCacheModel:
     '''Manages the blockchain data in the Redis cache'''
 
     def __init__(self):
@@ -23,10 +23,10 @@ class BlockCacheModel(object):
     def pop_transactions(self):
         '''Returns a popped transaction from the Redis cache -> Dict'''
 
-        return self.__redis_conn.blpop('records_cache', 5)
+        return self.__redis_conn.blpop('records_queue', 5)
 
 
-class BlockModel(object):
+class BlockModel:
     '''Manages the blockchain data in the mongoDB'''
 
     def __init__(self):
@@ -80,7 +80,7 @@ class BlockModel(object):
         self.__db_conn.delete_many({})
 
 
-class NodeModel(object):
+class NodeModel:
     '''Manages the peer node data in the blockchain network'''
 
     def __init__(self):
