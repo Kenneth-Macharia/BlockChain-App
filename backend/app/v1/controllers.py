@@ -27,8 +27,7 @@ class CacheController:
         '''Initializes the cache controller'''
 
         self.cache_db = BlockCacheModel()
-        self.cache_listener = Timer(60.0, self.fetch_new_transactions)
-        self.cache_listener.start()
+        self.fetch_new_transactions()
 
     def update_blockchain_cache(self, records):
         '''Formats blockchain data before adding to redis cache -> None'''
@@ -51,6 +50,7 @@ class CacheController:
         '''Gets new transactions to forge in to blocks from Redis queue -> '''
 
         # TODO: Check if there is a new item in the redis list
+
         transactions = []
         transactions.append(self.cache_db.pop_transactions())
 
@@ -61,6 +61,9 @@ class CacheController:
         # TODO: If forging fails, lpush the tranasction back into the cache
 
         # TODO: Timed er-forge for prior failed forges
+
+        # Wait 60 seconds and call function again
+        Timer(60.0, self.fetch_new_transactions).start()
 
 
 class BlockController:
