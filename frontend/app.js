@@ -46,19 +46,6 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize the backend
-// const req_data = {
-//   hostname: 'backend_1',
-//   port: 5000,
-//   path: '/backend/v1/init',
-//   method: 'POST'
-// }
-// http.request(req_data, response => {
-//   console.log(`statusCode: ${res.statusCode}`)
-
-//   res.on('data', d => {
-//     process.stdout.write(d);
-//   })
-// });
 
 request.post(
   'http://backend_1:5000/backend/v1/init',
@@ -69,9 +56,7 @@ request.post(
     if (err) {
       return console.log(err);
     }
-
-    console.log(`statusCode: ${res.statusCode}`)
-    console.log(res, body);
+    console.log(res.statusCode, body);
 });
 
 module.exports = app;
