@@ -20,7 +20,7 @@ from ...configs import secret_key, init_node
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
-class CacheController(object):
+class CacheController:
     ''' Manges transmission of blockchain data to from the redis cache'''
 
     def __init__(self):
@@ -54,7 +54,7 @@ class CacheController(object):
         transactions = []
         transactions.append(self.cache_db.pop_transactions())
 
-        print(transactions)
+        print(f'****{transactions}')
 
         # TODO: Prepare transaction and pass it to BlockController for forging
 
@@ -63,7 +63,7 @@ class CacheController(object):
         # TODO: Timed er-forge for prior failed forges
 
 
-class BlockController(object):
+class BlockController:
     '''Manages block forging and access to the blockchain'''
 
     pending_transactions = False
@@ -72,13 +72,14 @@ class BlockController(object):
         '''Initializes this node with a seed block'''
 
         self.blockchain_db = BlockModel()
+        self.cache_controller = CacheController()
 
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
                              transaction=['seed_block'])
 
-        self.cache_controller = CacheController()
+
 
     def forge_block(self, proof=None, previous_hash=None,
                     index=None, transaction={}):
@@ -101,7 +102,7 @@ class BlockController(object):
             (new transaction or seed block)
         '''
 
-        # * TO IMPLEMENT IN FRONTEND * (Unique transaction check)
+        # **** TO IMPLEMENT IN FRONTEND (Unique transaction check) ****
         if isinstance(transaction, dict) and transaction.get('plot_number',
                                                              False):
             search_criteria = [
@@ -112,6 +113,7 @@ class BlockController(object):
 
             if self.blockchain_db.block_exists(search_criteria):
                 return {'validation_error': 'Transaction already exist'}
+        # *********************************************
 
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
@@ -214,7 +216,7 @@ class BlockController(object):
                         self.blockchain_db.persist_new_block(block)
 
 
-class NodeController(object):
+class NodeController:
     '''Manages node registration and access to the node registry'''
 
     def __init__(self):
@@ -252,7 +254,7 @@ class NodeController(object):
         return peer_nodes
 
 
-class NetworkController(object):
+class NetworkController:
     '''Manages peer node interation in the blockchain network'''
 
     def request_data(self, node_url_list, endpoint, max_data_length):
@@ -313,7 +315,7 @@ class NetworkController(object):
         return {'payload': payload, 'error_nodes': error_nodes}
 
 
-class SecurityController(object):
+class SecurityController:
     '''Manages creation of node security features and authorization'''
 
     def validate_proof(self, last_proof, proof):
