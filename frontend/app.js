@@ -5,7 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const expHbs = require('express-handlebars');
-
+const backendHost = process.env.BACKEND_HOST;
 const indexRouter = require('./routes/index');
 
 const app = express();
@@ -46,9 +46,8 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize the backend
-
 request.post(
-  'http://backend_1:5000/backend/v1/init',
+  `http://${backendHost}:5000/backend/v1/init`,
   {
     json: true
   },
