@@ -23,7 +23,7 @@ class BlockCacheModel:
     def pop_transactions(self):
         '''Returns a popped transaction from the Redis cache -> Dict'''
 
-        return self.__redis_conn.blpop('records_queue', 10)
+        return self.__redis_conn.blpop('records_queue', 5)
 
 
 class BlockModel:

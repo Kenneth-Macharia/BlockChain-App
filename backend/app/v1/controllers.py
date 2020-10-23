@@ -49,21 +49,22 @@ class CacheController:
     def fetch_new_transactions(self):
         '''Gets new transactions to forge in to blocks from Redis queue -> '''
 
-        # TODO: Check if there is a new item in the redis list
-
+        # Fetch transactions from the redis cache
         transactions = []
         transactions.append(self.cache_db.pop_transactions())
 
-        print(f'****{transactions}')
+        # Send tranasctions to BlockController for forging into a blocks
+        if len(transactions) != 0:
+            print(transactions)
+            for record in transactions:
+                BlockController.forge_block(record[1].decode('utf-8'))
+        else:
+            print('No transactions to process')
 
-        # TODO: Prepare transaction and pass it to BlockController for forging
+        # TODO: lpush failed transaction(s) back to the front of the cache
 
-        # TODO: If forging fails, lpush the tranasction back into the cache
-
-        # TODO: Timed er-forge for prior failed forges
-
-        # Wait 60 seconds and call function again
-        Timer(60.0, self.fetch_new_transactions).start()
+        # Fetch next transaction(s) after a while
+        Timer(30.0, self.fetch_new_transactions).start()
 
 
 class BlockController:
