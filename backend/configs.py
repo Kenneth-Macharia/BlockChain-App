@@ -7,6 +7,9 @@ init_node = os.getenv('INIT_NODE_IP')
 secret_key = os.getenv('SECRET_KEY')
 api_key = os.getenv('API_KEY')
 
+public_ip = os.getenv('HOST_IP')
+port = os.getenv('HOST_PORT')
+
 mhost = os.getenv('MONGO_DB_HOST')
 muser = os.getenv('MONGO_DB_USER')
 mpassword = os.getenv('MONGO_DB_PASSWORD')
