@@ -70,7 +70,7 @@ router.post('/find', (req, res) => {
     }
   });
 
-  res.redirect('/');
+  // res.redirect('/');
 });
 
 module.exports = router;
