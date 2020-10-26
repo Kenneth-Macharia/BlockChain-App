@@ -17,32 +17,12 @@ redisClient.on('connect', () => {
   console.log('Connected to Redis...');
 });
 
-// Functions
-function getKey(cacheKey) {
-  redisClient.hget('records_cache', cacheKey, (err, result) => {
-    let record = null;
-
-    if (result) {
-      record = JSON.parse(result);
-    } else if (err) {
-      console.error(err);
-    }
-    return record;
-  });
-}
-
 // Routes
 router.get('/', (req, res) => {
   res.render('index', { title: 'Agile Records MIS' });
 });
 
 router.post('/add', (req, res) => {
-  // const queryRes = getKey(req.body.p_num);
-
-  // if (!queryRes) {
-  //   // TODO: check if buyer and seller id is same
-  // }
-
   const transaction = {
     plot_num: req.body.p_num,
     size: req.body.size,
@@ -59,14 +39,13 @@ router.post('/add', (req, res) => {
   };
 
   redisClient.rpush('records_queue', JSON.stringify(transaction), (
-    err, result,
+    err,
   ) => {
     if (err) {
       console.error(err);
     } else {
       redisClient.persist('records_queue');
       // res.redirect('/');
-      console.log(result); // TODO: Remove when done
       res.render('index', {
         success: 'Record Captured', // TODO: Add to template
       });
@@ -75,33 +54,21 @@ router.post('/add', (req, res) => {
 });
 
 router.post('/find', (req, res) => {
-  const queryRes = getKey(req.body.query);
+  const pltSearch = req.body.query;
 
-  if (queryRes) {
-    // result.plot_no = pltSearch; // TODO: Find way to display
-    console.log(queryRes); // TODO: Remove when done
-    res.render('index', {
-      records: queryRes,
-    });
-  } else {
-    res.render('index', {
-      error: 'Record does not exist',
-    });
-  }
-
-  // redisClient.hget('records_cache', pltSearch, (err, result) => {
-  //   if (!result) {
-  //     res.render('index', {
-  //       error: 'Record does not exist',
-  //     });
-  //   } else {
-  //     const resObj = JSON.parse(result);
-  //     // result.plot_no = pltSearch;
-  //     res.render('index', {
-  //       records: resObj,
-  //     });
-  //   }
-  // });
+  redisClient.hget('records_cache', pltSearch, (err, result) => {
+    if (!result) {
+      res.render('index', {
+        error: 'Record does not exist',
+      });
+    } else {
+      const resObj = JSON.parse(result);
+      // result.plot_no = pltSearch;
+      res.render('index', {
+        records: resObj,
+      });
+    }
+  });
 
   res.redirect('/');
 });
