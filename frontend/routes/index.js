@@ -1,6 +1,6 @@
 const express = require('express');
 const redis = require('redis');
-const request = require('../app');
+const request = require('request');
 
 const router = express.Router();
 const backendHost = process.env.BACKEND_HOST;
@@ -42,35 +42,38 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
-  request.get(
+  request.post(
     `http://${backendHost}:5000/backend/v1/block`,
     {
-      json: true,
+      json: {
+        plot_number: transaction.plot_num,
+        buyer_id: transaction.buyer_id,
+        seller_id: transaction.seller_id,
+      },
     },
     (err, response, body) => {
-      console.log(`validation: ${err}, ${response.statusCode}`); // TODO:REMOVE
-      if (err || response.statusCode !== 400 || response.statusCode !== 200) {
-        res.render('index', {
-          error: err, // TODO: Add to template
+      if (response.statusCode === 200) {
+        redisClient.rpush('records_queue', JSON.stringify(transaction), (
+          error,
+        ) => {
+          if (error) {
+            res.render('index', {
+              error: err, // TODO: Add to template
+            });
+          } else {
+            redisClient.persist('records_queue');
+            res.render('index', {
+              success: 'Record Captured', // TODO: Add to template
+            });
+          }
         });
       } else if (response.statusCode === 400) {
         res.render('index', {
           error: body, // TODO: Add to template
         });
-      } else if (response.statusCode === 200) {
-        redisClient.rpush('records_queue', JSON.stringify(transaction), (
-          error,
-        ) => {
-          console.log(`forging: ${error}`); // TODO:REMOVE
-          if (error) {
-            res.render('index', {
-              error: err, // TODO: Add to template
-            });
-          }
-          redisClient.persist('records_queue');
-          res.render('index', {
-            success: 'Record Captured', // TODO: Add to template
-          });
+      } else {
+        res.render('index', {
+          error: err, // TODO: Add to template
         });
       }
     },

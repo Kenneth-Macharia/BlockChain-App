@@ -62,4 +62,3 @@ request.post(
 );
 
 module.exports = app;
-module.exports = request;
