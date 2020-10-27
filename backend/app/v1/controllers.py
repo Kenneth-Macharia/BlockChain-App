@@ -55,9 +55,9 @@ class CacheController:
 
                 print(BlockController().forge_block(transaction=record))
         else:
-            print('No transactions to process')
+            print('Waiting for transactions to process....')
 
-        Timer(15.0, self.fetch_new_transactions).start()
+        Timer(10.0, self.fetch_new_transactions).start()
 
 
 class BlockController:
@@ -75,6 +75,22 @@ class BlockController:
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
                              transaction=['seed_block'])
+
+    def validate_transaction(self, validation_data):
+        '''Ensure no duplicate transaction before block forging -> Dict'''
+
+        if isinstance(
+            validation_data, dict) and validation_data.get(
+                'plot_number', False):
+
+            search_criteria = [
+                validation_data['plot_number'],
+                validation_data['seller_id'],
+                validation_data['buyer_id']
+            ]
+
+            if self.blockchain_db.block_exists(search_criteria):
+                return {'validation_error': 'Transaction already exist'}
 
     def forge_block(self, proof=None, previous_hash=None,
                     index=None, transaction={}):
@@ -96,16 +112,6 @@ class BlockController:
             no nodes to sync with (for init node): forge new block
             (new transaction or seed block)
         '''
-
-        if isinstance(transaction, dict) and transaction.get('plot_number',
-                                                             False):
-            search_criteria = [
-                transaction['plot_number'],
-                transaction['seller_id'],
-                transaction['buyer_id']
-            ]
-            if self.blockchain_db.block_exists(search_criteria):
-                return {'validation_error': 'Transaction already exist'}
 
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)

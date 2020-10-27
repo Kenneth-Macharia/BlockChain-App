@@ -24,7 +24,7 @@ class BlockCacheModel:
         '''Returns a popped transaction from the Redis cache -> Dict'''
 
         trans_list = []
-        trans_list.append(self.__redis_conn.blpop('records_queue', 5))
+        trans_list.append(self.__redis_conn.blpop('records_queue', 3))
 
         if None in trans_list:
             trans_list.remove(None)
