@@ -6,8 +6,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const expHbs = require('express-handlebars');
 const indexRouter = require('./routes/index');
+const backendHost = require('./routes/index');
 
-const backendHost = process.env.BACKEND_HOST;
 
 // create express app
 const app = express();
@@ -62,3 +62,4 @@ request.post(
 );
 
 module.exports = app;
+module.exports = request;
