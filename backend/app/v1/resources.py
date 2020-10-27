@@ -105,7 +105,7 @@ class SystemResource(Resource):
 class BlockResource(Resource):
     '''Manages a block resource'''
 
-    def get(self):
+    def post(self):
         '''Exposes the backend transaction validation endpoint, internally
         to the fronend service -> json
         '''
@@ -118,18 +118,15 @@ class BlockResource(Resource):
             'buyer_id': values['buyer_id'],
         }
 
-        result = BlockController().forge_block(
-            transaction=validation_data)
-
+        result = BlockController().validate_transaction(validation_data)
         message, status_code, payload = '', 0, []
 
-        if 'validation_error' in result.keys():
+        if result:
+            status_code = 400
             message = result
-            status_code = 400
-
         else:
-            message = 'OK to forge'
             status_code = 200
+            message = 'transaction is unique'
 
         response = {
             'message': message,
@@ -138,85 +135,85 @@ class BlockResource(Resource):
 
         return response, status_code
 
-    def post(self):
-        '''
-        Exposes the unprotected block forging endpoint, internally to the
-        frontend service -> json
+    # def post(self):
+    #     '''
+    #     Exposes the unprotected block forging endpoint, internally to the
+    #     frontend service -> json
 
-        Input samples:
-            {
-                "plot_number":"plt89567209",
-                "size": "0.25 acres",
-                "location":"Kangemi",
-                "county":"Nairobi",
-                "seller_id":24647567,
-                "buyer_id":20466890,
-                "amount":1500000,
-                "original_owner":"True"
-            }
-            {
-                "plot_number":"plt344567209",
-                "size": "0.5 acres",
-                "location":"Kikuyu",
-                "county":"Kiambu",
-                "seller_id":18647567,
-                "buyer_id":28976890,
-                "amount":800000,
-                "original_owner":"False"
-            }
-            {
-                "plot_number":"plt624523479",
-                "size": "1 acres",
-                "location":"Othaya",
-                "county":"Nyeri",
-                "seller_id":20647534,
-                "buyer_id":19976843,
-                "amount":970000,
-                "original_owner":"True"
-            }
-        '''
+    #     Input samples:
+    #         {
+    #             "plot_number":"plt89567209",
+    #             "size": "0.25 acres",
+    #             "location":"Kangemi",
+    #             "county":"Nairobi",
+    #             "seller_id":24647567,
+    #             "buyer_id":20466890,
+    #             "amount":1500000,
+    #             "original_owner":"True"
+    #         }
+    #         {
+    #             "plot_number":"plt344567209",
+    #             "size": "0.5 acres",
+    #             "location":"Kikuyu",
+    #             "county":"Kiambu",
+    #             "seller_id":18647567,
+    #             "buyer_id":28976890,
+    #             "amount":800000,
+    #             "original_owner":"False"
+    #         }
+    #         {
+    #             "plot_number":"plt624523479",
+    #             "size": "1 acres",
+    #             "location":"Othaya",
+    #             "county":"Nyeri",
+    #             "seller_id":20647534,
+    #             "buyer_id":19976843,
+    #             "amount":970000,
+    #             "original_owner":"True"
+    #         }
+    #     '''
 
-        values = request.get_json()
+    #     values = request.get_json()
 
-        transaction = {
-            'plot_number': values['plot_number'],
-            'size': values['size'],
-            'location': values['location'],
-            'county': values['county'],
-            'seller_id': values['seller_id'],
-            'buyer_id': values['buyer_id'],
-            'transfer_amount': values['amount'],
-            'original_owner': values['original_owner'],
-            'transfer_fee': {
-                'sender': values['buyer_id'],
-                'recipient': NodeController().node_id,
-                'amount': 10000,
-            }
-        }
+    #     transaction = {
+    #         'plot_number': values['plot_number'],
+    #         'size': values['size'],
+    #         'location': values['location'],
+    #         'county': values['county'],
+    #         'seller_id': values['seller_id'],
+    #         'buyer_id': values['buyer_id'],
+    #         'transfer_amount': values['amount'],
+    #         'original_owner': values['original_owner'],
+    #         'transfer_fee': {
+    #             'sender': values['buyer_id'],
+    #             'recipient': NodeController().node_id,
+    #             'amount': 10000,
+    #         }
+    #     }
 
-        result = BlockController().forge_block(
-            transaction=transaction)
+    #     result = BlockController().forge_block(
+    #         transaction=transaction)
 
-        message, status_code, payload = '', 0, []
+    #     message, status_code, payload = '', 0, []
 
-        if 'sync_error' in result.keys():
-            message = 'Sync Error'
-            status_code = 403
-            payload = result['sync_error']
+    #     if 'sync_error' in result.keys():
+    #         message = 'Sync Error'
+    #         status_code = 403
+    #         payload = result['sync_error']
 
-        elif 'validation_error' in result.keys():
-            message = 'Validation Error'
-            status_code = 400
-            payload = result['validation_error']
+    #     elif 'validation_error' in result.keys():
+    #         message = 'Validation Error'
+    #         status_code = 400
+    #         payload = result['validation_error']
 
-        else:
-            message = 'Transaction recorded'
-            status_code = 201
-            payload = result
+    #     else:
+    #         message = 'Transaction recorded'
+    #         status_code = 201
+    #         payload = result
 
-        response = {
-            'message': message,
-            'payload': payload
-        }
+    #     response = {
+    #         'message': message,
+    #         'payload': payload
+    #     }
 
-        return response, status_code
+    #     return response, status_code
