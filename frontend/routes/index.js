@@ -1,8 +1,8 @@
 const express = require('express');
 const redis = require('redis');
+const request = require('../app');
 
 const router = express.Router();
-const request = require('../app');
 const backendHost = process.env.BACKEND_HOST;
 const redisHost = process.env.REDIS_DB_HOST;
 const redisUser = process.env.REDIS_DB_USER;
@@ -43,7 +43,7 @@ router.post('/add', (req, res) => {
   };
 
   request.get(
-    `http://${backendHost}:5000/backend/v1/validate`,
+    `http://${backendHost}:5000/backend/v1/block`,
     {
       json: true,
     },
@@ -101,4 +101,3 @@ router.post('/find', (req, res) => {
 });
 
 module.exports = router;
-module.exports = backendHost;
