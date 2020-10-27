@@ -2,26 +2,30 @@ const express = require('express');
 const redis = require('redis');
 
 const router = express.Router();
+const request = require('../app');
+const backendHost = process.env.BACKEND_HOST;
 const redisHost = process.env.REDIS_DB_HOST;
 const redisUser = process.env.REDIS_DB_USER;
 const redisPassword = process.env.REDIS_DB_PASSWORD;
 
-// Redis Client
+// Create redis client
 const redisClient = redis.createClient({
   host: redisHost,
   user: redisUser,
   password: redisPassword,
 });
 
+// Connect to redis client
 redisClient.on('connect', () => {
   console.log('Connected to Redis...');
 });
 
-// Routes
+// Homepage route
 router.get('/', (req, res) => {
   res.render('index', { title: 'Agile Records MIS' });
 });
 
+// Add transaction route
 router.post('/add', (req, res) => {
   const transaction = {
     plot_num: req.body.p_num,
@@ -38,21 +42,44 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
-  redisClient.rpush('records_queue', JSON.stringify(transaction), (
-    err,
-  ) => {
-    if (err) {
-      console.error(err);
-    } else {
-      redisClient.persist('records_queue');
-      // res.redirect('/');
-      res.render('index', {
-        success: 'Record Captured', // TODO: Add to template
-      });
-    }
-  });
+  request.get(
+    `http://${backendHost}:5000/backend/v1/validate`,
+    {
+      json: true,
+    },
+    (err, response, body) => {
+      console.log(`validation: ${err}, ${response.statusCode}`); // TODO:REMOVE
+      if (err || response.statusCode !== 400 || response.statusCode !== 200) {
+        res.render('index', {
+          error: err, // TODO: Add to template
+        });
+      } else if (response.statusCode === 400) {
+        res.render('index', {
+          error: body, // TODO: Add to template
+        });
+      } else if (response.statusCode === 200) {
+        redisClient.rpush('records_queue', JSON.stringify(transaction), (
+          error,
+        ) => {
+          console.log(`forging: ${error}`); // TODO:REMOVE
+          if (error) {
+            res.render('index', {
+              error: err, // TODO: Add to template
+            });
+          }
+          redisClient.persist('records_queue');
+          res.render('index', {
+            success: 'Record Captured', // TODO: Add to template
+          });
+        });
+      }
+    },
+  );
+
+  // res.redirect('/');
 });
 
+// Search transaction route
 router.post('/find', (req, res) => {
   const pltSearch = req.body.query;
 
@@ -74,3 +101,4 @@ router.post('/find', (req, res) => {
 });
 
 module.exports = router;
+module.exports = backendHost;
