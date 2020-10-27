@@ -6,8 +6,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const expHbs = require('express-handlebars');
 const indexRouter = require('./routes/index');
-const backendHost = require('./routes/index');
 
+const backendHost = process.env.BACKEND_HOST;
 
 // create express app
 const app = express();
@@ -32,7 +32,7 @@ app.use('/add', indexRouter);
 app.use('/find', indexRouter);
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+app.use((next) => {
   next(createError(404));
 });
 
