@@ -105,6 +105,39 @@ class SystemResource(Resource):
 class BlockResource(Resource):
     '''Manages a block resource'''
 
+    def get(self):
+        '''Exposes the backend transaction validation endpoint, internally
+        to the fronend service -> json
+        '''
+
+        values = request.get_json()
+
+        validation_data = {
+            'plot_number': values['plot_number'],
+            'seller_id': values['seller_id'],
+            'buyer_id': values['buyer_id'],
+        }
+
+        result = BlockController().forge_block(
+            transaction=validation_data)
+
+        message, status_code, payload = '', 0, []
+
+        if 'validation_error' in result.keys():
+            message = result
+            status_code = 400
+
+        else:
+            message = 'OK to forge'
+            status_code = 200
+
+        response = {
+            'message': message,
+            'payload': payload
+        }
+
+        return response, status_code
+
     def post(self):
         '''
         Exposes the unprotected block forging endpoint, internally to the
