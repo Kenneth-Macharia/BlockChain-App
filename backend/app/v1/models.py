@@ -44,9 +44,11 @@ class BlockModel:
         '''Checks if a block in the chain matching the search criteria
         list -> Boolean'''
 
+        print(f'model: {criteria}')
+
         query_result = self.__db_conn.find_one(
             {"$and": [
-                {"transaction.plot_number": {'$eq': criteria[0]}},
+                {"transaction.plot_num": {'$eq': criteria[0]}},
                 {"transaction.seller_id": {'$eq': criteria[1]}},
                 {"transaction.buyer_id": {'$eq': criteria[2]}}
             ]}
