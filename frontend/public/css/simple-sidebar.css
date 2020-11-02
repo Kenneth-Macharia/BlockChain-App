@@ -54,24 +54,44 @@ hr {
 }
 
 .container-fluid {
-  width: 95%;
+  width: 70%;
+  padding-top: 1.2rem;
+}
+
+.sidebar-heading {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.sidebar-heading img {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.dropdown-menu a {
+  font-size: 80%;
+}
+
+.dropdown-menu img {
+  width: 80%;
+  height: 80%;
 }
 
 #find nav {
-  border: 1px solid #DAE0E4;
+  border: 0.0625rem solid #DAE0E4;
 }
 
 #add {
-  margin-top: 20px;
-  border: 1px solid #DAE0E4;
+  margin-top: 1.25rem;
+  border: 0.0625rem solid #DAE0E4;
 }
 
 #add form {
-  padding: 18px 6px 18px 6px;
+  padding: 1.125rem 0.375rem 1.125rem 0.375rem;
 }
 
 .search-results {
-  border: 1px solid #DAE0E4;
+  border: 0.0625rem solid #DAE0E4;
   height: 75vh;
   overflow: scroll;
 }
@@ -83,13 +103,13 @@ table {
 }
 
 td, th {
-  border: 1px solid #dddddd;
+  border: 0.0625rem solid #dddddd;
   text-align: center;
-  padding: 8px;
+  padding: 0.5rem;
 }
 
 tr {
-  line-height: 20px;
+  line-height: 1.125rem;
 }
 
 tr:nth-child(even) {
