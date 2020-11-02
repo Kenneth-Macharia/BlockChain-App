@@ -1,11 +1,5 @@
 // functions
 function sectionDisplay(param) {
-  // const titleMap = {
-  //   dash: 'Dashboard',
-  //   add: 'Add a record',
-  //   find: 'Find a record',
-  // };
-
   const sections = $('.container-fluid');
 
   // eslint-disable-next-line no-restricted-syntax
@@ -19,30 +13,10 @@ function sectionDisplay(param) {
   }
 }
 
-// Section selection on side bar button click
-// $('.dash').click((e) => {
-//   e.preventDefault();
-//   sectionDisplay('dash');
-// });
-
-// $('.find').click((e) => {
-//   e.preventDefault();
-//   sectionDisplay('find');
-// });
-
-// $('.add').click((e) => {
-//   e.preventDefault();
-//   sectionDisplay('add');
-// });
-
 // Section selection on app routing
 const sectionParam = window.location.pathname.replace('/', '');
 // eslint-disable-next-line default-case
 switch (sectionParam) {
-  // case '':
-  //   sectionDisplay('dash');
-  //   break;
-
   case '':
     sectionDisplay('find');
     break;
@@ -51,14 +25,6 @@ switch (sectionParam) {
     sectionDisplay('add');
     break;
 }
-
-// if (sectionParam === 'add') {
-//     sectionDisplay('add');
-// } else if (sectionParam == 'find') {
-//     sectionDisplay('find')
-// } else {
-//     sectionDisplay('dash');
-// }
 
 // Add section county & location drop-down options
 $('#county').change(() => {
@@ -89,9 +55,3 @@ $('#county').change(() => {
       break;
   }
 });
-
-// Side bar toogle
-// $("#menu-toggle").click(function (e) {
-//     e.preventDefault();
-//     $("#wrapper").toggleClass("toggled");
-// });
