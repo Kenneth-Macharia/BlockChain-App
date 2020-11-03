@@ -35,14 +35,22 @@
           <input class="form-control mr-sm-2" type="search" placeholder="Plot Number" required name="query">
           <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
         </form>
+
+        {{!-- Add record button --}}
+        <input id="addBtn" type="button" class="btn btn-outline-primary my-2 my-sm-0" value="Add Record" style="display: none;">
       </nav>
 
       <div class='notifications'>
-        {{#ifCond error}}
-          <h2 ><span class="badge badge-danger">{{error}}</span></h2>
+        {{#if info}}
+          <span class="badge {{class}}">{{message}}</span>
+          <style>
+            #addBtn { display: block; }
+          </style>
         {{else}}
-          <h2 ><span class="badge badge-info">{{notification}}</span></h2>
-        {{/ifCond}}
+          <style>
+            #addBtn { display: none; }
+          </style>
+        {{/if}}
       </div>
 
       <div class='search-results'>

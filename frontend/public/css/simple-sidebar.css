@@ -116,9 +116,7 @@ tr:nth-child(even) {
   background-color: #dddddd;
 }
 
-.error {
-  position: absolute;
-  top:52%;
-  left: 48%;
-  /* transform: translate(-10%, -10%); */
+.badge {
+  font-size: 95%;
+  margin: 0.5% 0 0.5% 0.5%;
 }
