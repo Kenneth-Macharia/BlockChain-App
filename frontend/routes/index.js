@@ -25,6 +25,28 @@ router.get('/', (req, res) => {
   res.render('index', { title: 'Agile Records MIS' });
 });
 
+// Search transaction route
+router.post('/find', (req, res) => {
+  const pltSearch = req.body.query;
+
+  redisClient.hget('records_cache', pltSearch, (err, result) => {
+    if (!result) {
+      res.render('index', {
+        info: true,
+        message: 'Record does not exist',
+        class: 'badge-danger',
+      });
+    } else {
+      const resObj = JSON.parse(result);
+      res.render('index', {
+        records: resObj,
+      });
+    }
+  });
+
+  // res.redirect('/');
+});
+
 // Add transaction route
 router.post('/add', (req, res) => {
   const transaction = {
@@ -42,6 +64,7 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
+  // unique transaction validation
   request.post(
     `http://${backendHost}:5000/backend/v1/block`,
     {
@@ -57,48 +80,27 @@ router.post('/add', (req, res) => {
           error,
         ) => {
           if (error) {
-            res.render('index', {
-              error: err, // TODO: Add to template
+            response.render('index', {
+              error: err,
             });
           } else {
             redisClient.persist('records_queue');
-            res.render('index', {
-              success: 'Record Captured', // TODO: Add to template
+            response.render('index', {
+              info: 'Record Captured',
             });
           }
         });
       } else if (response.statusCode === 400) {
-        res.render('index', {
-          error: body, // TODO: Add to template
+        response.render('index', {
+          error: body,
         });
       } else {
-        res.render('index', {
-          error: err, // TODO: Add to template
+        response.render('index', {
+          error: err,
         });
       }
     },
   );
-
-  // res.redirect('/');
-});
-
-// Search transaction route
-router.post('/find', (req, res) => {
-  const pltSearch = req.body.query;
-
-  redisClient.hget('records_cache', pltSearch, (err, result) => {
-    if (!result) {
-      res.render('index', {
-        error: 'Record does not exist',
-      });
-    } else {
-      const resObj = JSON.parse(result);
-      // result.plot_no = pltSearch;
-      res.render('index', {
-        records: resObj,
-      });
-    }
-  });
 
   // res.redirect('/');
 });

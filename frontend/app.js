@@ -48,17 +48,18 @@ app.use((err, req, res) => {
 });
 
 // Initialize the backend
-// request.post(
-//   `http://${backendHost}:5000/backend/v1/init`,
-//   {
-//     json: true,
-//   },
-//   (err, res, body) => {
-//     if (err) {
-//       return console.log(err);
-//     }
-//     return console.log(res.statusCode, body);
-//   },
-// );
+request.post(
+  `http://${backendHost}:5000/backend/v1/init`,
+  {
+    json: true,
+  },
+  (err, res, body) => {
+    if (err) {
+      console.log(err.message);
+    } else {
+      console.log(`${res.statusCode} | ${body.message}`);
+    }
+  },
+);
 
 module.exports = app;

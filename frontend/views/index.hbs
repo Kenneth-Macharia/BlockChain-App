@@ -38,11 +38,9 @@
       </nav>
 
       <div class='notifications'>
-        {{#ifCond error}}
-          <h2 ><span class="badge badge-danger">{{error}}</span></h2>
-        {{else}}
-          <h2 ><span class="badge badge-info">{{notification}}</span></h2>
-        {{/ifCond}}
+        {{#if info}}
+          <span class="badge {{class}}">{{message}}</span>
+        {{/if}}
       </div>
 
       <div class='search-results'>
