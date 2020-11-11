@@ -107,7 +107,7 @@ class BlockResource(Resource):
 
     def post(self):
         '''Exposes the backend transaction validation endpoint, internally
-        to the fronend service -> json
+        to the frontend service -> json
         '''
 
         values = request.get_json()

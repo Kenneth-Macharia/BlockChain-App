@@ -15,7 +15,7 @@ from threading import Timer
 from flask import request
 from datetime import date
 from uuid import uuid4
-from ...configs import secret_key, init_node, public_ip, port
+from ...configs import secret_key, init_node, public_ip, port, fe_host
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
@@ -52,12 +52,12 @@ class CacheController:
         if len(transactions) != 0:
             for transaction in transactions:
                 record = json.loads(transaction[1].decode('utf-8'))
-
-                print(BlockController().forge_block(transaction=record))
+                result = BlockController().forge_block(transaction=record)
+                requests.post(f'http://{fe_host}:3000/alerts', data=result)
         else:
             print('Waiting for transactions to process....')
 
-        Timer(10.0, self.fetch_new_transactions).start()
+        Timer(7.0, self.fetch_new_transactions).start()
 
 
 class BlockController:
@@ -141,7 +141,8 @@ class BlockController:
         # BlockController.pending_transactions = False
 
         new_block = self.blockchain_db.get_last_block()
-        return f'Transaction {new_block} successfully recorded'
+        return {'success': f"Transaction for \
+        {new_block} successfully recorded"}
 
     def extract_chain(self):
         '''
