@@ -65,7 +65,7 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
-  let forgeError = '';
+  let cacheErr = '';
 
   // unique transaction verification
   request.post(
@@ -85,18 +85,18 @@ router.post('/add', (req, res) => {
           if (!error) {
             redisClient.persist('records_queue');
           } else {
-            forgeError = error;
+            cacheErr = error;
           }
         });
       } else if (response.statusCode === 400) {
-        forgeError = body;
+        cacheErr = body;
       } else {
-        forgeError = err;
+        cacheErr = err;
       }
     },
   );
 
-  if (!forgeError) {
+  if (!cacheErr) {
     res.render('index', {
       info: true,
       msg: 'Record Captured',
@@ -105,7 +105,31 @@ router.post('/add', (req, res) => {
   } else {
     res.render('index', {
       err: true,
-      msg: forgeError,
+      msg: cacheErr,
+      class: 'badge-danger',
+    });
+  }
+
+  // res.redirect('/');
+});
+
+// Backend notifications
+router.post('/alerts', (req, res) => {
+  console.log(req.body);
+  const resObj = req.body;
+
+  if ('success' in resObj) {
+    console.log('***success!***');
+    // TODO: Render not working
+    res.render('index', {
+      info: true,
+      msg: 'Record Saved',
+      class: 'badge-info',
+    });
+  } else {
+    res.render('index', {
+      err: true,
+      msg: 'Forging Error',
       class: 'badge-danger',
     });
   }

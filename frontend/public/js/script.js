@@ -2,7 +2,7 @@
 $('#addRecBtn').click((e) => {
   e.preventDefault();
   $('#addRecordForm').css('display', 'block');
-  $('#info-badge').css('display', 'none');
+  $('.badge').css('display', 'none');
   $('#addRecBtn').css('display', 'none');
   $('.search-bar').css('display', 'none');
 });

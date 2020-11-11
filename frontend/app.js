@@ -16,7 +16,7 @@ app.set('view engine', 'hbs');
 // Sets handlebars configurations
 app.engine('hbs', expHbs({
   layoutsDir: path.join(__dirname, '/views/layouts'),
-  viewsDir: path.join(__dirname, 'views'),
+  viewsDir: path.join(__dirname, '/views'),
   extname: 'hbs',
   defaultView: 'main',
   helpers: {},
