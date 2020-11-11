@@ -1,33 +1,13 @@
-// functions
-function sectionDisplay(param) {
-  const sections = $('.container-fluid');
+// Events
+$('#addRecBtn').click((e) => {
+  e.preventDefault();
+  $('#addRecordForm').css('display', 'block');
+  $('#info-badge').css('display', 'none');
+  $('#addRecBtn').css('display', 'none');
+  $('.search-bar').css('display', 'none');
+});
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const section of sections) {
-    if (section.getAttribute('id') === param) {
-      // $('#section-heading').html(titleMap[param]);
-      section.style.display = 'block';
-    } else {
-      section.style.display = 'none';
-    }
-  }
-}
-
-// Section selection on app routing
-const sectionParam = window.location.pathname.replace('/', '');
-// eslint-disable-next-line default-case
-switch (sectionParam) {
-  case '':
-    sectionDisplay('find');
-    break;
-
-  case 'add':
-    sectionDisplay('add');
-    break;
-}
-
-// Add section county & location drop-down options
-$('#county').change(() => {
+$('#county').change(function selectCall() {
   // eslint-disable-next-line default-case
   switch (this.value) {
     case 'Nairobi':
@@ -55,3 +35,12 @@ $('#county').change(() => {
       break;
   }
 });
+
+// Functions
+(function displayAddBtn() {
+  if ($('#err-badge').length !== 0) {
+    $('#addRecBtn').css('display', 'block');
+  } else {
+    $('#addRecBtn').css('display', 'none');
+  }
+}());

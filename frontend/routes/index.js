@@ -32,14 +32,15 @@ router.post('/find', (req, res) => {
   redisClient.hget('records_cache', pltSearch, (err, result) => {
     if (!result) {
       res.render('index', {
-        info: true,
-        message: 'Record does not exist',
+        err: true,
+        msg: 'Record does not exist',
         class: 'badge-danger',
       });
     } else {
       const resObj = JSON.parse(result);
       res.render('index', {
-        records: resObj,
+        data: true,
+        searchRes: resObj,
       });
     }
   });
@@ -64,7 +65,9 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
-  // unique transaction validation
+  let forgeError = '';
+
+  // unique transaction verification
   request.post(
     `http://${backendHost}:5000/backend/v1/block`,
     {
@@ -79,28 +82,33 @@ router.post('/add', (req, res) => {
         redisClient.rpush('records_queue', JSON.stringify(transaction), (
           error,
         ) => {
-          if (error) {
-            response.render('index', {
-              error: err,
-            });
-          } else {
+          if (!error) {
             redisClient.persist('records_queue');
-            response.render('index', {
-              info: 'Record Captured',
-            });
+          } else {
+            forgeError = error;
           }
         });
       } else if (response.statusCode === 400) {
-        response.render('index', {
-          error: body,
-        });
+        forgeError = body;
       } else {
-        response.render('index', {
-          error: err,
-        });
+        forgeError = err;
       }
     },
   );
+
+  if (!forgeError) {
+    res.render('index', {
+      info: true,
+      msg: 'Record Captured',
+      class: 'badge-info',
+    });
+  } else {
+    res.render('index', {
+      err: true,
+      msg: forgeError,
+      class: 'badge-danger',
+    });
+  }
 
   // res.redirect('/');
 });
