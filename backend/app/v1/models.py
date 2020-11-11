@@ -14,9 +14,9 @@ class BlockCacheModel:
     def push_transaction(self, transaction_field, transaction_data):
         '''Pushes updated blockchain transactions to redis cache -> None'''
 
-        if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
-            self.__redis_conn.hset(
-                'records_cache', transaction_field, transaction_data)
+        # if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
+        self.__redis_conn.hset(
+            'records_cache', transaction_field, transaction_data)
 
         self.__redis_conn.persist(transaction_field)
 
