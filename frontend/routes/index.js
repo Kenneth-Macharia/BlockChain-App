@@ -22,7 +22,9 @@ redisClient.on('connect', () => {
 
 // Homepage route
 router.get('/', (req, res) => {
-  res.render('index', { title: 'Agile Records MIS' });
+  res.render('index', {
+    title: 'Agile Records MIS',
+  });
 });
 
 // Search transaction route
@@ -32,6 +34,7 @@ router.post('/find', (req, res) => {
   redisClient.hget('records_cache', pltSearch, (err, result) => {
     if (!result) {
       res.render('index', {
+        title: 'Agile Records MIS',
         err: true,
         msg: 'Record does not exist',
         class: 'badge-danger',
@@ -39,6 +42,7 @@ router.post('/find', (req, res) => {
     } else {
       const resObj = JSON.parse(result);
       res.render('index', {
+        title: 'Agile Records MIS',
         data: true,
         searchRes: resObj,
       });
@@ -98,12 +102,14 @@ router.post('/add', (req, res) => {
 
   if (!cacheErr) {
     res.render('index', {
+      title: 'Agile Records MIS',
       info: true,
       msg: 'Record Captured',
       class: 'badge-info',
     });
   } else {
     res.render('index', {
+      title: 'Agile Records MIS',
       err: true,
       msg: cacheErr,
       class: 'badge-danger',
@@ -122,12 +128,14 @@ router.post('/alerts', (req, res) => {
     console.log('***success!***');
     // TODO: Render not working
     res.render('index', {
+      title: 'Agile Records MIS',
       info: true,
       msg: 'Record Saved',
       class: 'badge-info',
     });
   } else {
     res.render('index', {
+      title: 'Agile Records MIS',
       err: true,
       msg: 'Forging Error',
       class: 'badge-danger',
