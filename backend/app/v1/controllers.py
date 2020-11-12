@@ -45,7 +45,7 @@ class CacheController:
                 record['transaction']['plot_num'], json.dumps(data))
 
     def fetch_new_transactions(self):
-        '''Gets new transactions to forge in to blocks from Redis queue -> '''
+        '''Gets new transactions to forge into blocks from Redis queue -> '''
 
         transactions = self.cache_db.pop_transactions()
 
