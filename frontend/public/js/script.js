@@ -33,6 +33,10 @@ $('#county').change(function selectCall() {
       $('#location').append(new Option('Karatina', 'Karatina'));
       $('#location').append(new Option('Mwiga', 'Mwiga'));
       break;
+
+    default:
+      $('#location').find('option').remove().end();
+      $('#location').append(new Option('Choose...', ''));
   }
 });
 
@@ -42,5 +46,18 @@ $('#county').change(function selectCall() {
     $('#addRecBtn').css('display', 'block');
   } else {
     $('#addRecBtn').css('display', 'none');
+  }
+}());
+
+(function displayVideoDemo() {
+  // eslint-disable-next-line no-restricted-globals
+  const urlPath = location.pathname;
+
+  if (urlPath === '/') {
+    $('.jumbotron').css('display', 'block');
+    $('.body').css('background-color', '#FFFFFF');
+  } else {
+    $('.jumbotron').css('display', 'none');
+    $('.body').css('background-color', '#EAECEF');
   }
 }());
