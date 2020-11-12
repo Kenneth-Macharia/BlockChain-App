@@ -79,7 +79,7 @@ margin-left: 0;
   margin-left: 10rem;
 }
 
-#addRecBtn {
+#addRecBtn, #addTransBtn {
   margin-left: 1rem;
 }
 
@@ -133,7 +133,7 @@ tr:nth-child(even) {
 }
 
 .jumbotron {
-  margin-top: 20px;
+  margin-top: 60px;
   padding: 30px 30px;
 }
 
@@ -143,10 +143,4 @@ tr:nth-child(even) {
 
 .jumbotron video {
   margin: 10px 0 0 100px;
-}
-
-.video {
-  /* position: absolute;
-  left: 350px;
-  top: 200px; */
 }

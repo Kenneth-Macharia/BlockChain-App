@@ -1,10 +1,49 @@
-// Events
-$('#addRecBtn').click((e) => {
-  e.preventDefault();
+// Functions
+function btnHelper() {
   $('#addRecordForm').css('display', 'block');
   $('.badge').css('display', 'none');
   $('#addRecBtn').css('display', 'none');
   $('.search-bar').css('display', 'none');
+}
+
+(function displayAddBtn() {
+  if ($('#err-badge').length !== 0) {
+    $('#addRecBtn').css('display', 'block');
+  } else {
+    $('#addRecBtn').css('display', 'none');
+  }
+}());
+
+(function displayAddTransBtn() {
+  if ($('#findRecords table').html() !== undefined) {
+    $('#addTransBtn').css('display', 'block');
+  } else {
+    $('#addTransBtn').css('display', 'none');
+  }
+}());
+
+(function displayVideoDemo() {
+  // eslint-disable-next-line no-restricted-globals
+  const urlPath = location.pathname;
+
+  if (urlPath === '/') {
+    $('.jumbotron').css('display', 'block');
+    $('.body').css('background-color', '#FFFFFF');
+  } else {
+    $('.jumbotron').css('display', 'none');
+    $('.body').css('background-color', '#EAECEF');
+  }
+}());
+
+// Events
+$('#addRecBtn').click((e) => {
+  e.preventDefault();
+  btnHelper();
+});
+
+$('#addTransBtn').click((e) => {
+  e.preventDefault();
+  btnHelper();
 });
 
 $('#county').change(function selectCall() {
@@ -39,25 +78,3 @@ $('#county').change(function selectCall() {
       $('#location').append(new Option('Choose...', ''));
   }
 });
-
-// Functions
-(function displayAddBtn() {
-  if ($('#err-badge').length !== 0) {
-    $('#addRecBtn').css('display', 'block');
-  } else {
-    $('#addRecBtn').css('display', 'none');
-  }
-}());
-
-(function displayVideoDemo() {
-  // eslint-disable-next-line no-restricted-globals
-  const urlPath = location.pathname;
-
-  if (urlPath === '/') {
-    $('.jumbotron').css('display', 'block');
-    $('.body').css('background-color', '#FFFFFF');
-  } else {
-    $('.jumbotron').css('display', 'none');
-    $('.body').css('background-color', '#EAECEF');
-  }
-}());
