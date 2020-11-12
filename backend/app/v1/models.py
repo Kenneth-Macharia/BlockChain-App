@@ -3,7 +3,7 @@
 from ...plugins import mongo, redis_client
 
 
-class BlockCacheModel(object):
+class BlockCacheModel:
     '''Manages the blockchain data in the Redis cache'''
 
     def __init__(self):
@@ -14,19 +14,25 @@ class BlockCacheModel(object):
     def push_transaction(self, transaction_field, transaction_data):
         '''Pushes updated blockchain transactions to redis cache -> None'''
 
-        if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
-            self.__redis_conn.hset(
-                'records_cache', transaction_field, transaction_data)
+        # if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
+        self.__redis_conn.hset(
+            'records_cache', transaction_field, transaction_data)
 
         self.__redis_conn.persist(transaction_field)
 
     def pop_transactions(self):
         '''Returns a popped transaction from the Redis cache -> Dict'''
 
-        return self.__redis_conn.blpop('records_cache', 5)
+        trans_list = []
+        trans_list.append(self.__redis_conn.blpop('records_queue', 3))
+
+        if None in trans_list:
+            trans_list.remove(None)
+
+        return trans_list
 
 
-class BlockModel(object):
+class BlockModel:
     '''Manages the blockchain data in the mongoDB'''
 
     def __init__(self):
@@ -38,9 +44,11 @@ class BlockModel(object):
         '''Checks if a block in the chain matching the search criteria
         list -> Boolean'''
 
+        print(f'model: {criteria}')
+
         query_result = self.__db_conn.find_one(
             {"$and": [
-                {"transaction.plot_number": {'$eq': criteria[0]}},
+                {"transaction.plot_num": {'$eq': criteria[0]}},
                 {"transaction.seller_id": {'$eq': criteria[1]}},
                 {"transaction.buyer_id": {'$eq': criteria[2]}}
             ]}
@@ -80,7 +88,7 @@ class BlockModel(object):
         self.__db_conn.delete_many({})
 
 
-class NodeModel(object):
+class NodeModel:
     '''Manages the peer node data in the blockchain network'''
 
     def __init__(self):

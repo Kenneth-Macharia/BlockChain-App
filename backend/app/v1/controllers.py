@@ -13,57 +13,54 @@ import requests
 import hashlib
 from threading import Timer
 from flask import request
-from time import time
+from datetime import date
 from uuid import uuid4
-from urllib.parse import urlparse
-from ...configs import secret_key, init_node
+from ...configs import secret_key, init_node, public_ip, port, fe_host
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
-class CacheController(object):
+class CacheController:
     ''' Manges transmission of blockchain data to from the redis cache'''
 
     def __init__(self):
         '''Initializes the cache controller'''
 
         self.cache_db = BlockCacheModel()
-        self.cache_listener = Timer(60.0, self.fetch_new_transactions)
-        self.cache_listener.start()
+        self.fetch_new_transactions()
 
     def update_blockchain_cache(self, records):
         '''Formats blockchain data before adding to redis cache -> None'''
 
         for record in records:
-            if record['index'] != 1:
-                data = {
-                    'current_owner': record['transaction']['buyer_id'],
-                    'size': record['transaction']['size'],
-                    'location': record['transaction']['location'],
-                    'county': record['transaction']['county'],
-                    'original_owner': record['transaction']['original_owner'],
-                    'timestamp': record['timestamp']
-                    }
+            data = {
+                'Owner Name': record['transaction']['buyer_name'],
+                'Owner ID': record['transaction']['buyer_id'],
+                'Size(Acres)': record['transaction']['size'],
+                'Location': record['transaction']['location'],
+                'County': record['transaction']['county'],
+                'Recorded': record['date']
+                }
 
-                self.cache_db.push_transaction(
-                    record['transaction']['plot_number'], json.dumps(data))
+            self.cache_db.push_transaction(
+                record['transaction']['plot_num'], json.dumps(data))
 
     def fetch_new_transactions(self):
         '''Gets new transactions to forge in to blocks from Redis queue -> '''
 
-        # TODO: Check if there is a new item in the redis list
-        transactions = []
-        transactions.append(self.cache_db.pop_transactions())
+        transactions = self.cache_db.pop_transactions()
 
-        print(transactions)
+        if len(transactions) != 0:
+            for transaction in transactions:
+                record = json.loads(transaction[1].decode('utf-8'))
+                result = BlockController().forge_block(transaction=record)
+                requests.post(f'http://{fe_host}:3000/alerts', data=result)
+        else:
+            print('Waiting for transactions to process....')
 
-        # TODO: Prepare transaction and pass it to BlockController for forging
-
-        # TODO: If forging fails, lpush the tranasction back into the cache
-
-        # TODO: Timed er-forge for prior failed forges
+        Timer(7.0, self.fetch_new_transactions).start()
 
 
-class BlockController(object):
+class BlockController:
     '''Manages block forging and access to the blockchain'''
 
     pending_transactions = False
@@ -78,6 +75,22 @@ class BlockController(object):
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
                              transaction=['seed_block'])
+
+    def validate_transaction(self, validation_data):
+        '''Ensure no duplicate transaction before block forging -> Dict'''
+
+        if isinstance(
+            validation_data, dict) and validation_data.get(
+                'plot_number', False):
+
+            search_criteria = [
+                validation_data['plot_number'],
+                validation_data['seller_id'],
+                validation_data['buyer_id']
+            ]
+
+            if self.blockchain_db.block_exists(search_criteria):
+                return {'validation_error': 'Transaction already exist'}
 
     def forge_block(self, proof=None, previous_hash=None,
                     index=None, transaction={}):
@@ -100,21 +113,10 @@ class BlockController(object):
             (new transaction or seed block)
         '''
 
-        # * TO IMPLEMENT IN FRONTEND * (Unique transaction check)
-        if isinstance(transaction, dict) and transaction.get('plot_number',
-                                                             False):
-            search_criteria = [
-                transaction['plot_number'],
-                transaction['seller_id'],
-                transaction['buyer_id']
-            ]
-
-            if self.blockchain_db.block_exists(search_criteria):
-                return {'validation_error': 'Transaction already exist'}
-
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
         if sync_result and index is None:
+            # TODO: lpush failed transaction(s) back to the front of the cache
             # BlockController.pending_transactions = True
 
             return sync_result
@@ -125,21 +127,22 @@ class BlockController(object):
 
         block = {
             'index': index or (last_block['index'] + 1),
-            'timestamp': time(),
+            'date': str(date.today()),
             'transaction': transaction,
             'proof': proof or security.proof_of_work(last_block['proof']),
             'previous_hash': previous_hash or security.hash_block(last_block)
         }
-
         self.blockchain_db.persist_new_block(block)
 
-        # Update Redis cache
-        self.cache_controller.update_blockchain_cache(self.extract_chain())
+        # Remove seed block & add the rest to Redis cache
+        self.cache_controller.update_blockchain_cache(self.extract_chain()[1:])
 
         # TODO: Check no pending transactions in Redis first before resetting
         # BlockController.pending_transactions = False
 
-        return self.blockchain_db.get_last_block()
+        new_block = self.blockchain_db.get_last_block()
+        return {'success': f"Transaction for \
+        {new_block} successfully recorded"}
 
     def extract_chain(self):
         '''
@@ -213,7 +216,7 @@ class BlockController(object):
                         self.blockchain_db.persist_new_block(block)
 
 
-class NodeController(object):
+class NodeController:
     '''Manages node registration and access to the node registry'''
 
     def __init__(self):
@@ -221,7 +224,7 @@ class NodeController(object):
 
         self.nodes_db = NodeModel()
         self.node_id = str(uuid4()).replace('-', '')
-        self.node_host = urlparse(request.host_url).netloc
+        self.node_host = f'{public_ip}:{port}'
         # {'198.162.1.2:5000'}
 
         if init_node:
@@ -251,7 +254,7 @@ class NodeController(object):
         return peer_nodes
 
 
-class NetworkController(object):
+class NetworkController:
     '''Manages peer node interation in the blockchain network'''
 
     def request_data(self, node_url_list, endpoint, max_data_length):
@@ -312,7 +315,7 @@ class NetworkController(object):
         return {'payload': payload, 'error_nodes': error_nodes}
 
 
-class SecurityController(object):
+class SecurityController:
     '''Manages creation of node security features and authorization'''
 
     def validate_proof(self, last_proof, proof):
