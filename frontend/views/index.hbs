@@ -1,0 +1,176 @@
+<div class="d-flex" id="wrapper">
+  <div id="page-content-wrapper">
+    <nav class="navbar navbar-expand-lg border-bottom">
+
+      <a href="/" class="logo"><img src="/images/logo.png" alt="logo">
+
+      {{!-- hamburger icon --}}
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      {{!-- navbar --}}
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {{!-- search nav bar --}}
+        <nav class="navbar navbar-light search-bar">
+          <a class="navbar-brand"></a>
+          <form class="form-inline" method="POST", action="/find">
+            <input class="form-control mr-sm-2" type="search" placeholder="Plot Number" required name="query">
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+          </form>
+
+          {{!-- Add record button --}}
+          <input id="addRecBtn" type="button" class="btn btn-outline-primary my-2 my-sm-0" value="Add Record" style="display: none;">
+
+          {{!-- Add transaction button --}}
+          <input id="addTransBtn" type="button" class="btn btn-outline-primary my-2 my-sm-0" value="Add Transaction to Record"
+          style="display: block;">
+
+        </nav>
+
+        {{!-- avatar drop down --}}
+        <ul class="navbar-nav ml-auto mt-2 mt-lg-0 dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="/images/avatar.png" alt="avatar">
+          </a>
+          <li class="nav-item">
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Action</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Sign Out</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    {{!-- body --}}
+    <div class="body">
+      <div class="container-fluid">
+        {{!-- notifications section --}}
+        <div class='notifications'>
+          {{#if err}}
+            <span id='err-badge' class="badge {{class}}">{{msg}}</span>
+          {{else if info}}
+            <span id='info-badge' class="badge {{class}}">{{msg}}</span>
+          {{/if}}
+        </div>
+
+        {{!-- search result section --}}
+        <div id="findRecords" class='search-results'>
+          {{#if data}}
+            <table>
+              <tr>
+                {{#each searchRes}}
+                  <th>{{@key}}</th>
+                {{/each}}
+              </tr>
+              <tr>
+                {{#each searchRes}}
+                  <td>{{this}}</td>
+                {{/each}}
+              </tr>
+            </table>
+          {{/if}}
+        </div>
+
+        {{!-- intro div --}}
+        <div class="jumbotron" style="display: none;">
+          <h4 class="display-4">Agile Records Manager</h4>
+          <hr class="my-4">
+          <p class="lead">The simple and secure land records management solution</p>
+
+          <video width="720" height="380" poster="/images/records-mgr.jpg" controls autoplay muted loop>
+            <source src="/videos/demo_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {{!-- add records / transaction form --}}
+        <div class="records-form" id="addRecordForm" style="display: none;">
+          <form method="POST" action="/add">
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="plot_num">Plot Number</label>
+                <input type="text" class="form-control" id="plot_num" name="p_num" required>
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="size">Size (Acres)</label>
+                <input type="number" class="form-control" id="size" placeholder="e.g 0.125 for 1/8 of an acre" required min="0" step="0.01" name="size">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="county">County</label>
+                <select id="county" class="form-control" required name="county">
+                  <option value='' selected>Choose...</option>
+                  <option value="Nairobi">Nairobi</option>
+                  <option value="Kiambu">Kiambu</option>
+                  <option value="Nyeri">Nyeri</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="location">Location</label>
+                <select id="location" class="form-control" required name="location">
+                  <option value='' selected>Choose...</option>
+                </select>
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="form-group col-md-5">
+                <label for="buyer-name">Buyer's Name</label>
+                <input type="text" class="form-control" id="buyer-name" required name="b_name">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-2">
+                <label for="buyer-id">Buyer's ID Number</label>
+                <input type="number" class="form-control" id="buyer-id" required name="b_id">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-3">
+                <label for="buyer-tel">Buyer's Tel. Number</label>
+                <input type="number" class="form-control" id="buyer-tel" required name="b_tel">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-5">
+                <label for="seller-name">Seller's Name</label>
+                <input type="text" class="form-control" id="seller-name" required name="s_name">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-2">
+                <label for="seller-id">Seller's ID Number</label>
+                <input type="number" class="form-control" id="seller-id" required name="s_id">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-3">
+                <label for="seller-tel">Seller's Tel. Number</label>
+                <input type="number" class="form-control" id="seller-tel" required name="s_tel">
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="value">Sale Value</label>
+                <input type="number" class="form-control" id="value" required name="sale_val">
+              </div>
+
+              <div class="form-group col-md-2"></div>
+
+              <div class="form-group col-md-3">
+                <label for="trans-cost">Transaction Cost</label>
+                <input type="number" class="form-control" id="trans-cost" required name="trans_cost">
+              </div>
+            </div>
+            <hr>
+            <button type="submit" class="btn btn-primary">Post Transaction
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
