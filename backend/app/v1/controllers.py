@@ -15,6 +15,7 @@ from threading import Timer
 from flask import request
 from datetime import date
 from uuid import uuid4
+from pathlib import Path
 from ...configs import secret_key, init_node, public_ip, port, fe_host
 from .models import BlockModel, NodeModel, BlockCacheModel
 
@@ -33,21 +34,24 @@ class CacheController:
 
         for record in records:
             data = {
-                'Owner Name': record['transaction']['buyer_name'],
-                'Owner ID': record['transaction']['buyer_id'],
-                'Size(Acres)': record['transaction']['size'],
-                'Location': record['transaction']['location'],
+                'PlotNumber': '',
+                'OwnerName': record['transaction']['buyer_name'],
+                'OwnerID': record['transaction']['buyer_id'],
+                'OwnerTel': record['transaction']['buyer_tel'],
                 'County': record['transaction']['county'],
-                'Recorded': record['date']
+                'Location': record['transaction']['location'],
+                'Size(Acres)': record['transaction']['size'],
+                'RecordedOn': record['date']
                 }
 
-            self.cache_db.push_transaction(
+            self.cache_db.push_to_cache(
                 record['transaction']['plot_num'], json.dumps(data))
 
     def fetch_new_transactions(self):
-        '''Gets new transactions to forge into blocks from Redis queue -> '''
+        '''Gets new transactions to forge into blocks from Redis
+        queue -> None'''
 
-        transactions = self.cache_db.pop_transactions()
+        transactions = self.cache_db.pop_from_queue()
 
         if len(transactions) != 0:
             for transaction in transactions:
@@ -55,9 +59,21 @@ class CacheController:
                 result = BlockController().forge_block(transaction=record)
                 requests.post(f'http://{fe_host}:3000/alerts', data=result)
         else:
-            print('Waiting for transactions to process....')
+            print('Waiting for transactions...')
 
-        Timer(7.0, self.fetch_new_transactions).start()
+        Timer(5.0, self.fetch_new_transactions).start()
+
+    def reset_failed_forge(self, failed_transaction):
+        '''Re-queues a failed transaction forge for another automatic
+        re-forge attempt -> None'''
+
+        self.cache_db.push_to_queue(json.dumps(failed_transaction))
+
+    def check_pending_transactions(self):
+        '''Checks if the redis queue has no pending transactions that
+        need to be forged into blocks -> int'''
+
+        return self.cache_db.pop_from_queue(length=True)
 
 
 class BlockController:
@@ -74,10 +90,11 @@ class BlockController:
         if not NodeController().extract_nodes() and \
                 self.blockchain_db.get_chain(True) == 0:
             self.forge_block(proof=100, previous_hash=10, index=1,
-                             transaction=['seed_block'])
+                             transaction={
+                                 'seed_block': 'blockchain_initialized'})
 
     def validate_transaction(self, validation_data):
-        '''Ensure no duplicate transaction before block forging -> Dict'''
+        '''Ensure no duplicate transaction before block forging -> dict'''
 
         if isinstance(
             validation_data, dict) and validation_data.get(
@@ -93,7 +110,7 @@ class BlockController:
                 return {'validation_error': 'Transaction already exist'}
 
     def forge_block(self, proof=None, previous_hash=None,
-                    index=None, transaction={}):
+                    index=None, transaction=None):
 
         '''
         1. Updates the chain, (ensuring all node have successfully
@@ -116,10 +133,17 @@ class BlockController:
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
         if sync_result and index is None:
-            # TODO: lpush failed transaction(s) back to the front of the cache
-            # BlockController.pending_transactions = True
+            self.cache_controller.reset_failed_forge(transaction)
+            BlockController.pending_transactions = True
 
-            return sync_result
+            logs_file = open(Path.cwd()/'backend_logs', 'a')
+
+            for err in sync_result['sync_error']:
+                logs_file.write(f"{err['message']}\n")
+
+            logs_file.close()
+
+            return {'failure': transaction.get("plot_num", None)}
 
         # Forge block and add it to our blockchain
         security = SecurityController()
@@ -137,12 +161,11 @@ class BlockController:
         # Remove seed block & add the rest to Redis cache
         self.cache_controller.update_blockchain_cache(self.extract_chain()[1:])
 
-        # TODO: Check no pending transactions in Redis first before resetting
-        # BlockController.pending_transactions = False
+        # Ensure that all pending transactions have been forged
+        if self.cache_controller.check_pending_transactions() == 0:
+            BlockController.pending_transactions = False
 
-        new_block = self.blockchain_db.get_last_block()
-        return {'success': f"Transaction for \
-        {new_block} successfully recorded"}
+        return {'success': transaction.get("plot_num", None)}
 
     def extract_chain(self):
         '''

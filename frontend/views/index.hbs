@@ -15,8 +15,8 @@
         <nav class="navbar navbar-light search-bar">
           <a class="navbar-brand"></a>
           <form class="form-inline" method="POST", action="/find">
-            <input class="form-control mr-sm-2" type="search" placeholder="Plot Number" required name="query">
-            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+            <input class="form-control mr-sm-2" type="search" placeholder="Plot Number" required name="query" id="searchInput">
+            <button class="btn btn-outline-primary my-2 my-sm-0" id="searchBtn" type="submit">Search</button>
           </form>
 
           {{!-- Add record button --}}
@@ -92,18 +92,13 @@
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="plot_num">Plot Number</label>
-                <input type="text" class="form-control" id="plot_num" name="p_num" required>
+                <input type="text" class="form-control protect" id="plot_num" name="p_num" required>
               </div>
             </div>
-            <hr>
             <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="size">Size (Acres)</label>
-                <input type="number" class="form-control" id="size" placeholder="e.g 0.125 for 1/8 of an acre" required min="0" step="0.01" name="size">
-              </div>
-              <div class="form-group col-md-4">
                 <label for="county">County</label>
-                <select id="county" class="form-control" required name="county">
+                <select id="county" class="form-control protect" required name="county">
                   <option value='' selected>Choose...</option>
                   <option value="Nairobi">Nairobi</option>
                   <option value="Kiambu">Kiambu</option>
@@ -112,19 +107,41 @@
               </div>
               <div class="form-group col-md-4">
                 <label for="location">Location</label>
-                <select id="location" class="form-control" required name="location">
+                <select id="location" class="form-control protect" required name="location">
                   <option value='' selected>Choose...</option>
                 </select>
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-3">
+                <label for="size">Size (Acres)</label>
+                <input type="number" class="form-control protect" id="size" placeholder="e.g 0.125 for 1/8 acre" required min="0"
+                step="0.01" name="size">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="seller-name">Owners's Name</label>
+                <input type="text" class="form-control protect" id="seller-name" required name="s_name">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-3">
+                <label for="seller-id">Owners's ID Number</label>
+                <input type="number" class="form-control protect" id="seller-id" required name="s_id">
+              </div>
+              <div class="form-group col-md-1"></div>
+              <div class="form-group col-md-3">
+                <label for="seller-tel">Owner's Tel. Number</label>
+                <input type="number" class="form-control protect" id="seller-tel" required name="s_tel">
               </div>
             </div>
             <hr>
             <div class="form-row">
-              <div class="form-group col-md-5">
+              <div class="form-group col-md-4">
                 <label for="buyer-name">Buyer's Name</label>
                 <input type="text" class="form-control" id="buyer-name" required name="b_name">
               </div>
               <div class="form-group col-md-1"></div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-md-3">
                 <label for="buyer-id">Buyer's ID Number</label>
                 <input type="number" class="form-control" id="buyer-id" required name="b_id">
               </div>
@@ -135,30 +152,11 @@
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col-md-5">
-                <label for="seller-name">Seller's Name</label>
-                <input type="text" class="form-control" id="seller-name" required name="s_name">
-              </div>
-              <div class="form-group col-md-1"></div>
-              <div class="form-group col-md-2">
-                <label for="seller-id">Seller's ID Number</label>
-                <input type="number" class="form-control" id="seller-id" required name="s_id">
-              </div>
-              <div class="form-group col-md-1"></div>
-              <div class="form-group col-md-3">
-                <label for="seller-tel">Seller's Tel. Number</label>
-                <input type="number" class="form-control" id="seller-tel" required name="s_tel">
-              </div>
-            </div>
-            <hr>
-            <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="value">Sale Value</label>
                 <input type="number" class="form-control" id="value" required name="sale_val">
               </div>
-
               <div class="form-group col-md-2"></div>
-
               <div class="form-group col-md-3">
                 <label for="trans-cost">Transaction Cost</label>
                 <input type="number" class="form-control" id="trans-cost" required name="trans_cost">
@@ -170,7 +168,6 @@
           </form>
         </div>
       </div>
-
     </div>
   </div>
 </div>

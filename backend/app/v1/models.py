@@ -11,25 +11,35 @@ class BlockCacheModel:
 
         self.__redis_conn = redis_client
 
-    def push_transaction(self, transaction_field, transaction_data):
+    def push_to_cache(self, transaction_field, transaction_data):
         '''Pushes updated blockchain transactions to redis cache -> None'''
 
-        # if self.__redis_conn.hexists('records_cache', transaction_field) == 0:
         self.__redis_conn.hset(
             'records_cache', transaction_field, transaction_data)
 
         self.__redis_conn.persist(transaction_field)
 
-    def pop_transactions(self):
-        '''Returns a popped transaction from the Redis cache -> Dict'''
+    def pop_from_queue(self, length=False):
+        '''Returns a popped transaction from the Redis queue,
+        otherwise returns its length if param[length] is set to True
+        -> dict or int'''
 
-        trans_list = []
-        trans_list.append(self.__redis_conn.blpop('records_queue', 3))
+        trans_list, list_len = [], 0
 
-        if None in trans_list:
-            trans_list.remove(None)
+        if length:
+            list_len = self.__redis_conn.llen('records_queue')
+        else:
+            trans_list.append(self.__redis_conn.blpop('records_queue', 2))
 
-        return trans_list
+            if None in trans_list:
+                trans_list.remove(None)
+
+        return list_len if length else trans_list
+
+    def push_to_queue(self, transaction):
+        '''Pushes a transaction to the front of the queue -> None'''
+
+        self.__redis_conn.lpush('records_queue', transaction)
 
 
 class BlockModel:
@@ -43,8 +53,6 @@ class BlockModel:
     def block_exists(self, criteria):
         '''Checks if a block in the chain matching the search criteria
         list -> Boolean'''
-
-        print(f'model: {criteria}')
 
         query_result = self.__db_conn.find_one(
             {"$and": [

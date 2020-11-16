@@ -1,9 +1,10 @@
 // Functions
 function btnHelper() {
-  $('#addRecordForm').css('display', 'block');
   $('.badge').css('display', 'none');
   $('#addRecBtn').css('display', 'none');
   $('.search-bar').css('display', 'none');
+  $('#findRecords').css('display', 'none');
+  $('#addRecordForm').css('display', 'block');
 }
 
 (function displayAddBtn() {
@@ -16,6 +17,13 @@ function btnHelper() {
 
 (function displayAddTransBtn() {
   if ($('#findRecords table').html() !== undefined) {
+    sessionStorage.setItem('pltNum', $('#findRecords table').find('tr:eq(1)').find('td:eq(0)').html());
+    sessionStorage.setItem('sellerName', $('#findRecords table').find('tr:eq(1)').find('td:eq(1)').html());
+    sessionStorage.setItem('sellerId', $('#findRecords table').find('tr:eq(1)').find('td:eq(2)').html());
+    sessionStorage.setItem('sellerTel', $('#findRecords table').find('tr:eq(1)').find('td:eq(3)').html());
+    sessionStorage.setItem('county', $('#findRecords table').find('tr:eq(1)').find('td:eq(4)').html());
+    sessionStorage.setItem('location', $('#findRecords table').find('tr:eq(1)').find('td:eq(5)').html());
+    sessionStorage.setItem('size', $('#findRecords table').find('tr:eq(1)').find('td:eq(6)').html());
     $('#addTransBtn').css('display', 'block');
   } else {
     $('#addTransBtn').css('display', 'none');
@@ -39,11 +47,31 @@ function btnHelper() {
 $('#addRecBtn').click((e) => {
   e.preventDefault();
   btnHelper();
+  $('#plot_num').val(sessionStorage.getItem('searchPltNum'));
+  $('#plot_num').focus();
 });
 
 $('#addTransBtn').click((e) => {
   e.preventDefault();
   btnHelper();
+  $('#county').val(sessionStorage.getItem('county'));
+  $('#county').trigger('change');
+  $('#plot_num').val(sessionStorage.getItem('pltNum'));
+  $('#size').val(sessionStorage.getItem('size'));
+  $('#seller-name').val(sessionStorage.getItem('sellerName'));
+  $('#seller-id').val(sessionStorage.getItem('sellerId'));
+  $('#seller-tel').val(sessionStorage.getItem('sellerTel'));
+  $('#location').val(sessionStorage.getItem('location'));
+  $('.protect').prop('disabled', true);
+  $('#buyer-name').focus();
+});
+
+$('#searchBtn').click(() => {
+  sessionStorage.setItem('searchPltNum', $('#searchInput').val());
+});
+
+$('#addRecordForm form').submit(() => {
+  $('.protect').prop('disabled', false);
 });
 
 $('#county').change(function selectCall() {

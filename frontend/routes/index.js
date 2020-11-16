@@ -41,6 +41,7 @@ router.post('/find', (req, res) => {
       });
     } else {
       const resObj = JSON.parse(result);
+      resObj.PlotNumber = pltSearch;
       res.render('index', {
         title: 'Agile Records MIS',
         data: true,
@@ -48,8 +49,6 @@ router.post('/find', (req, res) => {
       });
     }
   });
-
-  // res.redirect('/');
 });
 
 // Add transaction route
@@ -104,7 +103,7 @@ router.post('/add', (req, res) => {
     res.render('index', {
       title: 'Agile Records MIS',
       info: true,
-      msg: 'Record Captured',
+      msg: 'Transaction captured',
       class: 'badge-info',
     });
   } else {
@@ -115,33 +114,28 @@ router.post('/add', (req, res) => {
       class: 'badge-danger',
     });
   }
-
-  // res.redirect('/');
 });
 
 // Backend notifications
 router.post('/alerts', (req, res) => {
-  console.log(req.body);
-  const resObj = req.body;
+  const resMsg = req.body;
 
-  if ('success' in resObj) {
-    console.log('***success!***');
-    // TODO: Render not working
+  if ('success' in resMsg) {
     res.render('index', {
       title: 'Agile Records MIS',
       info: true,
-      msg: 'Record Saved',
+      msg: `Transaction for ${resMsg.success} added to blockchain`,
       class: 'badge-info',
     });
   } else {
+    console.log(resMsg.failure);
     res.render('index', {
       title: 'Agile Records MIS',
       err: true,
-      msg: 'Forging Error',
+      msg: `Adding ${resMsg.failure} to blockchain failed, contact IT`,
       class: 'badge-danger',
     });
   }
-
   // res.redirect('/');
 });
 
