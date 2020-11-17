@@ -4,6 +4,7 @@ python:
 env:
   global:
     - TEST="testing"
+    - FLASK_ENV="development"
     - MONGO_DB_HOST="localhost"
     - MONGO_DB_USER="travis"
     - MONGO_DB_PASSWORD="test"
