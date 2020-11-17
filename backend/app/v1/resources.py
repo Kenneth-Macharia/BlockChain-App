@@ -4,7 +4,6 @@ import json
 from flask import request
 from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
-from .controllers import secret_key
 
 
 class NodeResources(Resource):

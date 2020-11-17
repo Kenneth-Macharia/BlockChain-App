@@ -16,7 +16,7 @@ from flask import request
 from datetime import date
 from uuid import uuid4
 from pathlib import Path
-from ...configs import secret_key, init_node, public_ip, port, fe_host
+from ...configs import secret_key, init_node, public_ip, port, fe_host, testing
 from .models import BlockModel, NodeModel, BlockCacheModel
 
 
@@ -59,7 +59,10 @@ class CacheController:
                 result = BlockController().forge_block(transaction=record)
                 requests.post(f'http://{fe_host}:3000/alerts', data=result)
         else:
-            print('Waiting for transactions...')
+            if testing:
+                return
+            else:
+                print('Waiting for transactions...')
 
         Timer(5.0, self.fetch_new_transactions).start()
 
