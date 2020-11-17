@@ -1,8 +1,10 @@
 '''This module contains the app resources'''
 
+import json
 from flask import request
 from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
+from .controllers import secret_key
 
 
 class NodeResources(Resource):
@@ -29,7 +31,6 @@ class NodeResources(Resource):
                 payload = None
 
             else:
-                BlockController()   # Intializes Blockchain if first node
                 NodeController().register_node(url)
 
                 node_List = NodeController().extract_nodes()
@@ -135,85 +136,29 @@ class BlockResource(Resource):
 
         return response, status_code
 
-    # def post(self):
-    #     '''
-    #     Exposes the unprotected block forging endpoint, internally to the
-    #     frontend service -> json
 
-    #     Input samples:
-    #         {
-    #             "plot_number":"plt89567209",
-    #             "size": "0.25 acres",
-    #             "location":"Kangemi",
-    #             "county":"Nairobi",
-    #             "seller_id":24647567,
-    #             "buyer_id":20466890,
-    #             "amount":1500000,
-    #             "original_owner":"True"
-    #         }
-    #         {
-    #             "plot_number":"plt344567209",
-    #             "size": "0.5 acres",
-    #             "location":"Kikuyu",
-    #             "county":"Kiambu",
-    #             "seller_id":18647567,
-    #             "buyer_id":28976890,
-    #             "amount":800000,
-    #             "original_owner":"False"
-    #         }
-    #         {
-    #             "plot_number":"plt624523479",
-    #             "size": "1 acres",
-    #             "location":"Othaya",
-    #             "county":"Nyeri",
-    #             "seller_id":20647534,
-    #             "buyer_id":19976843,
-    #             "amount":970000,
-    #             "original_owner":"True"
-    #         }
-    #     '''
+class BlockResourcesDemo(Resource):
+    '''Demo block resources manager'''
 
-    #     values = request.get_json()
+    def get(self):
+        '''Exposes the demo get entire blockchain endpoint -> json'''
 
-    #     transaction = {
-    #         'plot_number': values['plot_number'],
-    #         'size': values['size'],
-    #         'location': values['location'],
-    #         'county': values['county'],
-    #         'seller_id': values['seller_id'],
-    #         'buyer_id': values['buyer_id'],
-    #         'transfer_amount': values['amount'],
-    #         'original_owner': values['original_owner'],
-    #         'transfer_fee': {
-    #             'sender': values['buyer_id'],
-    #             'recipient': NodeController().node_id,
-    #             'amount': 10000,
-    #         }
-    #     }
+        blocks = BlockController()
+        result = blocks.extract_chain()
 
-    #     result = BlockController().forge_block(
-    #         transaction=transaction)
+        if result is None:
+            message = 'Chain not complete due to pending transactions'
+            status_code = 403
+            payload = []
 
-    #     message, status_code, payload = '', 0, []
+        else:
+            message = 'Blockchain'
+            status_code = 200
+            payload = result
 
-    #     if 'sync_error' in result.keys():
-    #         message = 'Sync Error'
-    #         status_code = 403
-    #         payload = result['sync_error']
+        response = {
+            'message': message,
+            'payload': payload,
+        }
 
-    #     elif 'validation_error' in result.keys():
-    #         message = 'Validation Error'
-    #         status_code = 400
-    #         payload = result['validation_error']
-
-    #     else:
-    #         message = 'Transaction recorded'
-    #         status_code = 201
-    #         payload = result
-
-    #     response = {
-    #         'message': message,
-    #         'payload': payload
-    #     }
-
-    #     return response, status_code
+        return response, status_code

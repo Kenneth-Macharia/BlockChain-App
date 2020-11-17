@@ -1,12 +1,14 @@
 const express = require('express');
 const redis = require('redis');
 const request = require('request');
+const fs = require('fs');
 
 const router = express.Router();
 const backendHost = process.env.BACKEND_HOST;
 const redisHost = process.env.REDIS_DB_HOST;
 const redisUser = process.env.REDIS_DB_USER;
 const redisPassword = process.env.REDIS_DB_PASSWORD;
+const cwd = process.cwd();
 
 // Create redis client
 const redisClient = redis.createClient({
@@ -64,7 +66,7 @@ router.post('/add', (req, res) => {
     seller_name: req.body.s_name,
     seller_id: req.body.s_id,
     seller_tel: req.body.s_tel,
-    value: req.body.sale_val,
+    transaction_value: req.body.sale_val,
     transaction_cost: req.body.trans_cost,
   };
 
@@ -72,7 +74,7 @@ router.post('/add', (req, res) => {
 
   // unique transaction verification
   request.post(
-    `http://${backendHost}:5000/backend/v1/block`,
+    `http://${backendHost}/backend/v1/block`,
     {
       json: {
         plot_number: transaction.plot_num,
@@ -116,27 +118,18 @@ router.post('/add', (req, res) => {
   }
 });
 
-// Backend notifications
-router.post('/alerts', (req, res) => {
+// Forge logging
+router.post('/alerts', (req) => {
   const resMsg = req.body;
+  const writer = fs.createWriteStream(`${cwd}/frontend_logs`, {
+    flags: 'a',
+  });
 
   if ('success' in resMsg) {
-    res.render('index', {
-      title: 'Agile Records MIS',
-      info: true,
-      msg: `Transaction for ${resMsg.success} added to blockchain`,
-      class: 'badge-info',
-    });
+    writer.write(`Transaction for ${resMsg.success} added to blockchain\n`);
   } else {
-    console.log(resMsg.failure);
-    res.render('index', {
-      title: 'Agile Records MIS',
-      err: true,
-      msg: `Adding ${resMsg.failure} to blockchain failed, contact IT`,
-      class: 'badge-danger',
-    });
+    writer.write(`Adding ${resMsg.failure} to blockchain failed, contact IT\n`);
   }
-  // res.redirect('/');
 });
 
 module.exports = router;

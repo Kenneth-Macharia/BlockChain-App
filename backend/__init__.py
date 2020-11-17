@@ -5,9 +5,11 @@ from flask_restful import Api
 from .plugins import mongo, redis_client
 from . import configs
 from .app.v1.blueprint import v1_bp
-from .app.v1.resources import (SystemResource, BlockResources,
-                               NodeResources, BlockResource)
-
+from .app.v1.resources import (SystemResource,
+                               BlockResources,
+                               NodeResources,
+                               BlockResource,
+                               BlockResourcesDemo)
 
 # Use the dev/testing or production configs
 if configs.testing:
@@ -39,6 +41,8 @@ def create_app(config_object=app_configs):
         api_v1.add_resource(BlockResource, '/block')
         api_v1.add_resource(BlockResources, '/blocks')
         api_v1.add_resource(NodeResources, '/nodes')
+        # TODO: for blockchain demo purposes only
+        api_v1.add_resource(BlockResourcesDemo, '/blockchain')
 
         # Register app blueprints
         app.register_blueprint(v1_bp, url_prefix='/backend/v1')

@@ -11,3 +11,4 @@ worker_join_script.sh
 orchestrate
 node_modules
 backend_logs
+frontend_logs
