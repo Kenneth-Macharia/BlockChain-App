@@ -1,6 +1,13 @@
+# *** AWS Graviton2 build CPU support configs **
+os: linux
+dist: focal
+group: edge
+arch: arm64-graviton2
+compiler: clang
+# ****
 language: python
 python:
-- '3.7'
+  - '3.7'
 env:
   global:
     - TEST="testing"
@@ -17,17 +24,18 @@ env:
     - INIT_NODE_IP='localhost:5001'
     - INIT_NODE_IP=
 services:
-- mongodb
-- redis
-- docker
+  - mongodb
+  - redis
+  - docker
 install:
-- pip install -r backend/requirements.txt
+  - pip install -r backend/requirements.txt
 before_script:
   - mongo test_db --eval 'db.createUser({user:"travis",pwd:"test", roles:["readWrite"]});'
 script:
-- coverage run -m --source=backend/app unittest && coverage report -m
+  - clang --version
+  - coverage run -m --source=backend/app unittest && coverage report -m
 after_success:
-- coveralls
+  - coveralls
 deploy:
   provider: script
   script: bash docker_deploy
