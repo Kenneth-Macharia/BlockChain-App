@@ -13,7 +13,7 @@ import requests
 import hashlib
 from threading import Timer
 from flask import request
-from datetime import date
+from datetime import date, datetime
 from uuid import uuid4
 from pathlib import Path
 from ...configs import secret_key, init_node, public_ip, port, fe_host, testing
@@ -139,10 +139,11 @@ class BlockController:
             self.cache_controller.reset_failed_forge(transaction)
             BlockController.pending_transactions = True
 
+            curr_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             logs_file = open(Path.cwd()/'backend_logs', 'a')
 
             for err in sync_result['sync_error']:
-                logs_file.write(f"{err['message']}\n")
+                logs_file.write(f"[{curr_time}] {err['message']}\n")
 
             logs_file.close()
 
