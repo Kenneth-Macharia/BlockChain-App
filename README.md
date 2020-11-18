@@ -6,33 +6,31 @@
 
 ## Description
 
-- A demo application that implements land records as a blockchain.
+- A web app that implements land records as a blockchain.
 - Blockchains offer improved security against records tampering making them ideal to safeguard ownership records of high-value assets.
 - They also give a history of transactions that have occured on a particular asset rather than just the asset's current ownership state.
 
 ## The Components
 
-The application is made up of the following container services:
+- The application is made up of the following containerized services:
 
-    1. A Node.js (Express) frontend service which renders the UI views and can
-    be used to link the applcation to other external applications via
+    1. A node.js (express) service which renders the UI and can
+    be used to link the app to other external applications via
     APIs.
 
-    2. A Redis cache between the frontend and backend services, which will
-     offer fast record look-ups as well as a queue for transaction persisting to the main Database.
+    2. A flask-restful backend service which secures the blockchain and
+    co-ordinates data flow between the Node service and the backend and across the blockchain peer network.
 
-    3. A Flask-Restful backend service which secures the blockchain and
-    co-ordinates data flow between the front and back end and across the peer
-    network.
+    3. A Redis cache and queue service between the node and flask services. The cache keep a simplified copy of the blockchain records thus offering fast record look-ups without having to hit the backend DB. The cache is updated whenever a new block/ transaction is added to the blockchain. The queue holds new transactions captured by the node service before being persisted to the backend DB, ensuring asynchronous data capture. Transactions are popped from the queue using a separate thread running in the flask service.
 
-    4. A MongoDB database: the main persistance storage.
+    4. A MongoDB database service: the backend main storage, which holds the entire blockchain for the hub.
 
-- Each service will be packaged into a Docker image and deployed to an image registry through Travis CI, after automated tests pass.
-- They can then be pulled into a cluster environment and orchestrated.
+- The services 1 & 2 will be built into Docker images and deployed to an image registry using Travis CI, after automated tests have pass.
+- They can then be pulled into a cluster environment alongside official images for the two data stores 3 & 4 and orchestrated to achieve the apps functionality.
 
 ## App Implementation Scenario
 
 - Multiple hubs (each containing a 3-node cluster) can be spun up to create a blockchain peer network.
 - Each hub will run the application on it's cluster and store it's own blockchain of the records.
-- Record/ block queries can be perfomed at each of the hubs as well as adding new blocks/ new records to the blockchain.
-- Each hub will automatically sync with the other peer hubs before forging a new block, to gurantee the blockchain's validity across the peer network.
+- Record queries as well as additions can be perfomed at each of the hubs.
+- Each hub will automatically sync with the other peer hubs via an API in the falsk service, before forging a new block/ transaction, to gurantee the blockchain's validity across the peer network.
