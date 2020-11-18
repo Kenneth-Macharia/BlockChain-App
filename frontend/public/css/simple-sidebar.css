@@ -76,7 +76,7 @@ margin-left: 0;
 }
 
 .search-bar {
-  margin-left: 10rem;
+  margin-left: 2rem;
 }
 
 #addRecBtn, #addTransBtn {
@@ -95,7 +95,7 @@ margin-left: 0;
 
 .badge {
   font-size: 90%;
-  margin: 0.5% 0 0.5% 40%;
+  margin: 0.5% 0 0.5% 30%;
 }
 
 .records-form {

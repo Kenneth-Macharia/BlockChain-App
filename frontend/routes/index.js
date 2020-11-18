@@ -2,6 +2,7 @@ const express = require('express');
 const redis = require('redis');
 const request = require('request');
 const fs = require('fs');
+const dateTime = require('node-datetime');
 
 const router = express.Router();
 const backendHost = process.env.BACKEND_HOST;
@@ -74,7 +75,7 @@ router.post('/add', (req, res) => {
 
   // unique transaction verification
   request.post(
-    `http://${backendHost}/backend/v1/block`,
+    `http://${backendHost}:5000/backend/v1/block`,
     {
       json: {
         plot_number: transaction.plot_num,
@@ -105,7 +106,7 @@ router.post('/add', (req, res) => {
     res.render('index', {
       title: 'Agile Records MIS',
       info: true,
-      msg: 'Transaction captured',
+      msg: 'Transaction queued. Check logs for save status',
       class: 'badge-info',
     });
   } else {
@@ -125,10 +126,12 @@ router.post('/alerts', (req) => {
     flags: 'a',
   });
 
+  const currTime = dateTime.create().format('d-m-Y H:M:S');
+
   if ('success' in resMsg) {
-    writer.write(`Transaction for ${resMsg.success} added to blockchain\n`);
+    writer.write(`[${currTime}] Successfully added transaction for ${resMsg.success} to the blockchain.\n`);
   } else {
-    writer.write(`Adding ${resMsg.failure} to blockchain failed, contact IT\n`);
+    writer.write(`[${currTime}] Adding ${resMsg.failure} to blockchain failed, contact IT for assistance.\n`);
   }
 });
 
