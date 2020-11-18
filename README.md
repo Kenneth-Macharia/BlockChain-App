@@ -17,11 +17,20 @@
         APIs.
 
         2. A flask-restful backend service which secures the blockchain and
-        co-ordinates data flow between the Node service and the backend and across the blockchain peer network.
+        co-ordinates data flow between the Node service and the backend and
+        across the blockchain peer network.
 
-        3. A Redis cache and queue service between the node and flask services. The cache keep a simplified copy of the blockchain records thus offering fast record look-ups without having to hit the backend DB. The cache is updated whenever a new block/ transaction is added to the blockchain. The queue holds new transactions captured by the node service before being persisted to the backend DB, ensuring asynchronous data capture. Transactions are popped from the queue using a separate thread running in the flask service.
+        3. A Redis cache and queue service between the node and flask
+         services. The cache keep a simplified copy of the blockchain records
+        thus offering fast record look-ups without having to hit the backend
+        DB. The cache is updated whenever a new block/ transaction is added
+        to the blockchain. The queue holds new transactions captured by the
+        node service before being persisted to the backend DB, ensuring
+        asynchronous data capture. Transactions are popped from the queue
+        using a separate thread running in the flask service.
 
-        4. A MongoDB database service: the backend main storage, which holds the entire blockchain for the hub.
+        4. A MongoDB database service: the backend main storage, which holds
+        the entire blockchain for the hub.
 
 - The services 1 & 2 will be packaged into Docker images and deployed to an image registry using Travis CI, after automated tests have pass.
 - They can then be pulled into a cluster environment alongside official images for the two data stores 3 & 4 and orchestrated to achieve the apps functionality.
