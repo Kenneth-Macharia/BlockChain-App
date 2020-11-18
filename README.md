@@ -1,10 +1,8 @@
-# Blockchain Application
-
 [![Build Status](https://travis-ci.com/Kenneth-Macharia/BlockChain-App.svg?branch=master)](https://travis-ci.com/Kenneth-Macharia/BlockChain-App)
 [![Coverage Status](https://coveralls.io/repos/github/Kenneth-Macharia/BlockChain-App/badge.svg?branch=master&service=github)](https://coveralls.io/github/Kenneth-Macharia/BlockChain-App?branch=master)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2aeb21c8472244498f1c634303d3d105)](https://www.codacy.com/manual/Kenneth-Macharia/BlockChain-App?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Kenneth-Macharia/BlockChain-App&amp;utm_campaign=Badge_Grade)
 
-## Description
+# Blockchain Application
 
 - A web app that implements land records as a blockchain.
 - Blockchains offer improved security against records tampering making them ideal to safeguard ownership records of high-value assets.
