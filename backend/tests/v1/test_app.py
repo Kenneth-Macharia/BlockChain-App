@@ -16,14 +16,7 @@ MOCK_NODE1 = MockServer(5001)
 BASE_URL = 'http://localhost:5000/backend/v1'
 
 NEW_TRANSACTION = {
-    "plot_number": "plt89567209",
-    "size": "0.25 acres",
-    "location": "Kangemi",
-    "county": "Nairobi",
-    "seller_id": 24647567,
-    "buyer_id": 20466890,
-    "amount": 1500000,
-    "original_owner": "True"
+    
 }
 
 
