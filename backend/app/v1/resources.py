@@ -6,6 +6,16 @@ from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
 
 
+class SystemResource(Resource):
+    '''Manages sytem checks requests by the frontend'''
+
+    def post(self):
+        '''Initializes the backend'''
+
+        BlockController()
+        return {'message': 'Backend initialized'}, 201
+
+
 class NodeResources(Resource):
     '''Manages node resources'''
 
@@ -90,16 +100,6 @@ class BlockResources(Resource):
         }
 
         return response, status_code
-
-
-class SystemResource(Resource):
-    '''Manages sytem checks requests by the frontend'''
-
-    def post(self):
-        '''Initializes the backend'''
-
-        BlockController()
-        return {'message': 'Backend initialized'}, 201
 
 
 class BlockResource(Resource):
