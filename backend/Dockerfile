@@ -15,4 +15,8 @@ EXPOSE 5000
 
 COPY . .
 
+RUN adduser -D backend_user
+
+USER backend_user
+
 CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]

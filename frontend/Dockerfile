@@ -12,4 +12,8 @@ EXPOSE 3000
 
 COPY . .
 
+RUN adduser -D frontend_user
+
+USER frontend_user
+
 CMD ["npm", "start"]

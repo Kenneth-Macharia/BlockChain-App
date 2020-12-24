@@ -3,6 +3,8 @@
 import requests
 from flask import json
 from unittest import TestCase
+from time import sleep
+from pathlib import Path
 from ...plugins import mongo, redis_client
 from .configs import api_key, init_node
 from ... import create_app
@@ -14,13 +16,30 @@ TEST_CLIENT = create_app().test_client()
 DB = mongo.db
 MOCK_NODE1 = MockServer(5001)
 BASE_URL = 'http://localhost:5000/backend/v1'
+BACKEND_LOG_FILE = f'{Path.cwd()}/backend/backend_logs'
 
 NEW_TRANSACTION = {
-    
+    'plot_num': 'plt9876543210',
+    'size': 2,
+    'county': 'Nairobi',
+    'location': 'Kangemi',
+    'buyer_name': 'Buyer01',
+    'buyer_id': '21908737',
+    'buyer_tel': '0724679389',
+    'seller_name': 'Seller01',
+    'seller_id': '24849389',
+    'seller_tel': '0721398984',
+    'transaction_value': 3589700,
+    'transaction_cost': 2580,
 }
 
 
 # ------ HELPER FUNCTIONS ------
+def init_test_client():
+    response = TEST_CLIENT.post('http://localhost:5000/backend/v1/init')
+    print(f'>>>{response.status_code}')
+
+
 def start_mockserver():
     MOCK_NODE1.start()
 
@@ -31,12 +50,36 @@ def stop_mockserver():
 
 def reset_test_datastores():
     # MongoDB
-    for collection in DB.list_collection_names():
-        DB.drop_collection(collection)
+    for colls in DB.list_collection_names():
+        DB.drop_collection(colls)
 
     # Redis
     redis_client.expire('records_cache', 0)
     redis_client.expire('records_queue', 0)
+
+    # Log files
+    if Path(BACKEND_LOG_FILE).exists():
+        Path(BACKEND_LOG_FILE).unlink()
+
+
+def push_to_redis_queue():
+    redis_client.lpush('records_queue', json.dumps(NEW_TRANSACTION))
+
+
+def read_logs(node):
+    if Path(BACKEND_LOG_FILE).exists():
+        logs_obj = open(BACKEND_LOG_FILE)
+
+        for log in logs_obj.readlines():
+            if f'Failed to connect to: {node}' in log:
+                return True
+        return False
+
+        logs_obj.close()
+
+
+def verify_record_forge():
+    pass
 
 
 # ------- TEST CASES ----------
@@ -189,6 +232,9 @@ class TestBlockChain(TestCase):
         self.test_block_url = f'{BASE_URL}/block'
         self.test_blockchain_url = f'{BASE_URL}/blocks'
 
+        # Initialize test_client
+        init_test_client()
+
     def tearDown(self):
         '''Wipes the test database after each test'''
 
@@ -228,32 +274,38 @@ class TestBlockChain(TestCase):
         '''Tests failed block forging on the /POST/block endpoint'''
 
         '''Blocks can't be forged unless there are atleast two peer
-        nodes in the blockchain network.
+        nodes in the blockchain network. A node with a registered
+        peer node, can't forge a block unless it successfully syncs
+        with the registered peer.
         '''
-
-        # TODO: change forging proceedure
-
-        ''' A node with a registered peer node, can't forge a
-        block unless it successfully syncs with the registred peer.
-        '''
+        # ===========================================================
+        # register a peer node. Using INIT NODE address, ensure test
+        # passes whether test client is the INIT NODE or not.
         new_node_headers = {
-            'URL': 'localhost:5002',
+            'URL': 'localhost:5001',
             'API_KEY': api_key,
             "Content-Type": "application/json"
         }
 
-        # register a peer node
         response = TEST_CLIENT.get(
             f'{BASE_URL}/nodes', headers=new_node_headers)
 
         self.assertEqual(response.status_code, 200)
         res_payload = json.loads(response.data)['payload']
-        self.assertIn('localhost:5002', res_payload)
+        self.assertIn('localhost:5001', res_payload)
 
-        # Block forging on test client fails because it cannot sync with
-        # the newly registered node 'localhost:5002' as it is not live.
+        # Push new transaction to redis queue to be forged
+        push_to_redis_queue()
+        print('Paused, waiting for forge...')
+        sleep(120)
 
-        # TODO: change forging proceedure
+        '''Test block forging failure on test client because it cannot
+        sync with the newly registered node 'localhost:5002' because
+        is not live'''
+
+        # Test failed sync log is present
+        self.assertEqual(read_logs('localhost:5001'), True)
+        # ===========================================================
 
     def test_block_forging_with_sync_data_replacement(self):
         '''
@@ -276,7 +328,7 @@ class TestBlockChain(TestCase):
         '''
 
         # Start Mock servers to enable nodes sync while block forging
-        start_mockserver()
+        # start_mockserver()
 
         if init_node:
             server1_headers = {
@@ -346,55 +398,54 @@ class TestBlockChain(TestCase):
             # Test forging of duplicate blocks is not possible
             # TODO: change forging proceedure
 
-
             # self.assertEqual(response.status_code, 400)
             # res_payload = json.loads(response.data)['payload']
             # self.assertIn('Transaction already exist', res_payload)
 
 
-class TestRedisCache(TestCase):
-    '''Tests Redis cache update on blockchain update'''
+# class TestRedis(TestCase):
+#     '''Tests Redis cache update on blockchain update'''
 
-    def setUp(self):
-        '''Setup before each test'''
+#     def setUp(self):
+#         '''Setup before each test'''
 
-        self.test_block_url = f'{BASE_URL}/block'
+#         self.test_block_url = f'{BASE_URL}/block'
 
-    def tearDown(self):
-        '''Wipes the test cache after each test'''
+#     def tearDown(self):
+#         '''Wipes the test cache after each test'''
 
-        stop_mockserver()
-        reset_test_datastores()
+#         stop_mockserver()
+#         reset_test_datastores()
 
-    def test_cache_states(self):
-        '''Test the state of the cache before and after blockchain updates'''
+#     def test_cache_states(self):
+#         '''Test the state of the cache before and after blockchain updates'''
 
-        # Ensure the cache is empty
-        self.assertEqual(0, redis_client.hlen('records_cache'))
+#         # Ensure the cache is empty
+#         self.assertEqual(0, redis_client.hlen('records_cache'))
 
-        # Forge a block
-        mock_node_headers = {
-            'URL': 'localhost:5001',
-            'API_KEY': api_key,
-            "Content-Type": "application/json"
-        }
-        response = TEST_CLIENT.get(
-            f'{BASE_URL}/nodes', headers=mock_node_headers)
-        self.assertEqual(response.status_code, 200)
+#         # Forge a block
+#         mock_node_headers = {
+#             'URL': 'localhost:5001',
+#             'API_KEY': api_key,
+#             "Content-Type": "application/json"
+#         }
+#         response = TEST_CLIENT.get(
+#             f'{BASE_URL}/nodes', headers=mock_node_headers)
+#         self.assertEqual(response.status_code, 200)
 
-        nodes_response_payload = {
-            "message": "Registered_nodes",
-            "payload": ['localhost:5000']
-        }
-        MOCK_NODE1.add_json_response(
-            '/backend/v1/nodes', nodes_response_payload)
+#         nodes_response_payload = {
+#             "message": "Registered_nodes",
+#             "payload": ['localhost:5000']
+#         }
+#         MOCK_NODE1.add_json_response(
+#             '/backend/v1/nodes', nodes_response_payload)
 
-        blocks_response_payload = {
-            "message": "Blockchain",
-            "payload": []
-        }
-        MOCK_NODE1.add_json_response(
-            '/backend/v1/blocks', blocks_response_payload)
+#         blocks_response_payload = {
+#             "message": "Blockchain",
+#             "payload": []
+#         }
+#         MOCK_NODE1.add_json_response(
+#             '/backend/v1/blocks', blocks_response_payload)
 
         # TODO: change forging proceedure
 
