@@ -135,4 +135,21 @@ router.post('/alerts', (req) => {
   }
 });
 
+// Render logs page
+router.get('/logs', (req, res) => {
+  fs.readFile(`${cwd}/frontend_logs`, 'utf8',(err, data) => {
+    if (!err) {
+      res.render('logs', {
+        title: 'Agile Records MIS | Logs',
+        contents: data,
+      });
+    } else {
+      res.render('logs', {
+        title: 'Agile Records MIS | Logs',
+        contents: err,
+      });
+    }
+  });
+});
+
 module.exports = router;

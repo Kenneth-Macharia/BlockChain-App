@@ -104,6 +104,11 @@ margin-left: 0;
   border-radius: 5px;
 }
 
+.logs {
+  overflow-y: auto;
+  padding: 2rem;
+}
+
 .records-form form {
   padding: 2rem 2rem 2rem 2rem;
 }
