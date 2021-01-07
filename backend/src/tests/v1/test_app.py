@@ -5,12 +5,12 @@ from flask import json
 from unittest import TestCase
 from ...plugins import mongo, redis_client
 from .configs import api_key, init_node
-from ... import create_app
+from ... import app
 from .mock_server import MockServer
 
 
 # -------- GLOBALS ---------
-TEST_CLIENT = create_app().test_client()
+TEST_CLIENT = app.test_client()
 DB = mongo.db
 MOCK_NODE1 = MockServer(5001)
 BASE_URL = 'http://localhost:5000/backend/v1'

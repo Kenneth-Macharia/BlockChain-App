@@ -28,7 +28,7 @@ services:
   - redis
   - docker
 install:
-  - pip install -r backend/requirements.txt
+  - pip install -r backend/src/requirements.txt
 before_script:
   - mongo test_db --eval 'db.createUser({user:"travis",pwd:"test", roles:["readWrite"]});'
 script:
