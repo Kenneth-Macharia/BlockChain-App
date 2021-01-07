@@ -7,7 +7,7 @@ RUN apk add --update && mkdir -p /usr/src
 
 WORKDIR /usr/backend/src
 
-COPY src/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
