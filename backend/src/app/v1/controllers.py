@@ -137,6 +137,7 @@ class BlockController:
 
         # Update the blockchain from other peer nodes
         sync_result = self.sync(update_chain=True)
+
         if sync_result and index is None:
             self.cache_controller.reset_failed_forge(transaction)
             BlockController.pending_transactions = True
@@ -144,8 +145,11 @@ class BlockController:
             curr_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             logs_file = open(Path.cwd()/'backend_logs', 'a')
 
-            for err in sync_result['sync_error']:
-                logs_file.write(f"[{curr_time}] {err['message']}\n")
+            if isinstance(sync_result['sync_error'], list):
+                for err in sync_result['sync_error']:
+                    logs_file.write(f"[{curr_time}] {err['message']}\n")
+            else:
+                logs_file.write(f"[{curr_time}] {sync_result['sync_error']}\n")
 
             logs_file.close()
 

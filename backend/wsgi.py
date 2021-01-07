@@ -1,6 +1,5 @@
 '''This module is the app's entry apoint'''
 
-from . import create_app
+from src import app as application
 
-if __name__ == "__main__":
-    create_app().run()
+app = application

@@ -5,7 +5,7 @@
     ssh_key: "{{ lookup('env', 'AZURE_SSH_KEY') }}"
   tasks:
     - name: Fetch and persist azure ssh key
-      shell: source ./aux_files/ssh_key
+      shell: source ./aux_files/ssh_key_src.sh
 
 # ------------------------------- HUB 1 ------------------------------------ #
     ## HUB1 COMMON RESOURCES ##
@@ -141,7 +141,7 @@
     - name: Create H1_VM1 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub1_VM1_public_ip
 
     - name: Create H1_VM1 network interface card
@@ -178,7 +178,7 @@
     - name: Create H1_VM2 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub1_VM2_public_ip
 
     - name: Create H1_VM2 network interface card
@@ -215,7 +215,7 @@
     - name: Create H1_VM3 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub1_VM3_public_ip
 
     - name: Create H1_VM3 network interface card
@@ -379,7 +379,7 @@
         address_prefix: "10.0.2.0/24"
         virtual_network: hub2_vnet
 
-    ## HUB2 VM1 RESOURCES ##
+     ## HUB2 VM1 RESOURCES ##
     - name: Create H2_VM1 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
@@ -416,7 +416,7 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## hub2 VM2 RESOURCES ##
+     ## hub2 VM2 RESOURCES ##
     - name: Create H2_VM2 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
@@ -453,7 +453,7 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## hub2 VM3 RESOURCES ##
+     ## hub2 VM3 RESOURCES ##
     - name: Create H2_VM3 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2

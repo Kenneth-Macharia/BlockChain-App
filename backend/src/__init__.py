@@ -13,9 +13,9 @@ from .app.v1.resources import (SystemResource,
 
 # Use the dev/testing or production configs
 if configs.testing:
-    app_configs = 'backend.tests.v1.configs'
+    app_configs = 'src.tests.v1.configs'
 else:
-    app_configs = 'backend.configs'
+    app_configs = 'src.configs'
 
 
 def create_app(config_object=app_configs):
@@ -48,3 +48,6 @@ def create_app(config_object=app_configs):
         app.register_blueprint(v1_bp, url_prefix='/backend/v1')
 
     return app
+
+
+app = create_app()

@@ -3,7 +3,7 @@
   gather_facts: true
   tasks:
     - name: Copy manager join script file from swarm leader
-      shell: "scp azureuser@13.94.251.58:/home/azureuser/manager_join_src.sh ./aux_files/"
+      shell: "scp azureuser@40.114.231.136:/home/azureuser/manager_join_src.sh ./aux_files/"
 
     - name: Copy worker join script file from swarm leader
-      shell: "scp azureuser@13.94.251.58:/home/azureuser/worker_join_src.sh ./aux_files/"
+      shell: "scp azureuser@40.114.231.136:/home/azureuser/worker_join_src.sh ./aux_files/"
