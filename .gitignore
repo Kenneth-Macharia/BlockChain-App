@@ -1,7 +1,6 @@
 __pycache__
 .DS_Store
 .condaauto
-.coverage
 test_runner
 manager_join_src.sh
 ssh_key_src.sh
