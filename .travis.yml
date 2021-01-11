@@ -42,5 +42,6 @@ after_success:
 deploy:
   provider: script
   script: bash docker_deploy
+  skip_cleanup: true
   on:
     branch: master
