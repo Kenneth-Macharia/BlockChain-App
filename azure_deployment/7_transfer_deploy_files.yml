@@ -1,0 +1,7 @@
+# UPDATE HUB SWARM  LEADER IP ADDRESS
+---
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Copy orchestration file to swarm leader
+      shell: "scp ./aux_files/start_app.yml azureuser@40.114.231.136:/home/azureuser/"

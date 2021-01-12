@@ -41,7 +41,6 @@ def create_app(config_object=app_configs):
         api_v1.add_resource(BlockResource, '/block')
         api_v1.add_resource(BlockResources, '/blocks')
         api_v1.add_resource(NodeResources, '/nodes')
-        # TODO: for blockchain demo purposes only
         api_v1.add_resource(BlockResourcesDemo, '/blockchain')
 
         # Register app blueprints

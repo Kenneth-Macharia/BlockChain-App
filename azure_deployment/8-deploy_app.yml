@@ -4,4 +4,4 @@
   gather_facts: true
   tasks:
     - name: Deploy app to swarm cluster
-      shell: "docker stack deploy -c /home/azureuser/deploy_app_init.yml blockchain"
+      shell: "docker stack deploy -c /home/azureuser/start_app.yml blockchain"

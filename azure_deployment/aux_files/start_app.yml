@@ -1,0 +1,81 @@
+version: "3.3"
+
+services:
+    mongo:
+        image: mongo:4.2.8
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${MPASS}
+
+    redis:
+        image: redis:6.0.3
+        configs:
+            - source: config_file
+              target: /usr/local/etc/redis.conf
+        command: [ "redis-server", "--appendonly", "yes"]
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+
+    backend:
+        image: kennethmacharia/blockchain-backend:latest
+        volumes:
+          - /etc/timezone:/etc/timezone:ro
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+            - 8090:5000
+        depends_on:
+            - mongo
+            - redis
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+        environment:
+            INIT_NODE_IP: ${INIT}
+            SECRET_KEY: ${SECRET}
+            MONGO_DB_HOST: mongo_1
+            MONGO_DB_USER: root
+            MONGO_DB_PASSWORD: ${MPASS}
+            REDIS_DB_HOST: redis_1
+            REDIS_DB_USER: default
+            REDIS_DB_PASSWORD: ${RPASS}
+            HOST_PORT: 8090
+            FRONTEND_HOST: frontend
+
+        command: gunicorn -w 1 -b 0.0.0.0:5000 wsgi
+
+    frontend:
+        image: kennethmacharia/blockchain-frontend:latest
+        volumes:
+          - /etc/timezone:/etc/timezone:ro
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+            - 8080:3000
+        depends_on:
+            - redis
+            - backend
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+        environment:
+            REDIS_DB_HOST: redis
+            REDIS_DB_USER: default
+            REDIS_DB_PASSWORD:
+            BACKEND_HOST: backend
+
+configs:
+    config_file:
+    #TODO: Check location in VM's
+        file: /usr/local/etc/redis.conf

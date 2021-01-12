@@ -5,7 +5,7 @@
     ssh_key: "{{ lookup('env', 'AZURE_SSH_KEY') }}"
   tasks:
     - name: Fetch and persist azure ssh key
-      shell: source aux_files/ssh_key_src.sh
+      shell: source aux_files/ssh_key_src
 
 # ------------------------------- HUB 1 ------------------------------------ #
     ## HUB1 COMMON RESOURCES ##
@@ -379,7 +379,7 @@
         address_prefix: "10.0.2.0/24"
         virtual_network: hub2_vnet
 
-     ## HUB2 VM1 RESOURCES ##
+    ## HUB2 VM1 RESOURCES ##
     - name: Create H2_VM1 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
@@ -416,7 +416,7 @@
           sku: '18.04-LTS'
           version: latest
 
-     ## hub2 VM2 RESOURCES ##
+    ## HUB2 VM2 RESOURCES ##
     - name: Create H2_VM2 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
@@ -453,7 +453,7 @@
           sku: '18.04-LTS'
           version: latest
 
-     ## hub2 VM3 RESOURCES ##
+    ## HUB2 VM3 RESOURCES ##
     - name: Create H2_VM3 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2

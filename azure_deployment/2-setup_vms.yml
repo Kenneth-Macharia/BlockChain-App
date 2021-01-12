@@ -7,6 +7,9 @@
       shell: curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && usermod -aG docker azureuser
 
     - name: Copy Redis config file
-      shell: curl https://api.onedrive.com/v1.0/shares/u\!aHR0cHM6Ly8xZHJ2Lm1zL3UvcyFBa0VISDVMN0pmSGRobkp5QnRDSkZCQTVCU2dXP2U9ZnJVRmRk/root/content --output redis.conf
+      shell: curl https://api.onedrive.com/v1.0/shares/u!aHR0cHM6Ly8xZHJ2Lm1zL3UvcyFBa0VISDVMN0pmSGRobkp5QnRDSkZCQTVCU2dXP2U9T0Zxb011/root/content --output redis.conf
+
+    - name: Copy Credentials .env file
+      shell: curl https://api.onedrive.com/v1.0/shares/u!aHR0cHM6Ly8xZHJ2Lm1zL3UvcyFBa0VISDVMN0pmSGRoblRRa1FfcEh1a2lnSEpZP2U9UEZHZFp2/root/content --output .env
 
 # Check host security configs for runnign docker using the docker-bench-security tool: https://github.com/docker/docker-bench-security
