@@ -13,7 +13,7 @@ class SystemResource(Resource):
         '''Initializes the backend'''
 
         BlockController()
-        return {'message': 'Backend initialized'}, 201
+        return {'message': 'Blockchain initialized.'}, 201
 
 
 class NodeResources(Resource):

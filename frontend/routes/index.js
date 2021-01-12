@@ -10,6 +10,10 @@ const redisHost = process.env.REDIS_DB_HOST;
 const redisUser = process.env.REDIS_DB_USER;
 const redisPassword = process.env.REDIS_DB_PASSWORD;
 const cwd = process.cwd();
+const currTime = dateTime.create().format('d-m-Y H:M:S');
+const writer = fs.createWriteStream(`${cwd}/frontend_logs`, {
+  flags: 'a',
+});
 
 // Create redis client
 const redisClient = redis.createClient({
@@ -20,7 +24,7 @@ const redisClient = redis.createClient({
 
 // Connect to redis client
 redisClient.on('connect', () => {
-  console.log('Connected to Redis...');
+  writer.write(`[${currTime}] Connected to the Redis database.\n`);
 });
 
 // Homepage route
@@ -122,11 +126,6 @@ router.post('/add', (req, res) => {
 // Forge logging
 router.post('/alerts', (req) => {
   const resMsg = req.body;
-  const writer = fs.createWriteStream(`${cwd}/frontend_logs`, {
-    flags: 'a',
-  });
-
-  const currTime = dateTime.create().format('d-m-Y H:M:S');
 
   if ('success' in resMsg) {
     writer.write(`[${currTime}] Successfully added transaction for ${resMsg.success} to the blockchain.\n`);
@@ -137,11 +136,13 @@ router.post('/alerts', (req) => {
 
 // Render logs page
 router.get('/logs', (req, res) => {
-  fs.readFile(`${cwd}/frontend_logs`, 'utf8',(err, data) => {
+  fs.readFile(`${cwd}/frontend_logs`, 'utf8', (err, data) => {
+    const fileArray = data.split('\n');
+
     if (!err) {
       res.render('logs', {
         title: 'Agile Records MIS | Logs',
-        contents: data,
+        contents: fileArray,
       });
     } else {
       res.render('logs', {
@@ -152,4 +153,6 @@ router.get('/logs', (req, res) => {
   });
 });
 
-module.exports = router;
+exports.routing = router;
+exports.fsWriter = writer;
+exports.time = currTime;

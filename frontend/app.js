@@ -5,7 +5,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const expHbs = require('express-handlebars');
-const indexRouter = require('./routes/index');
+const indexRouter = require('./routes/index').routing;
+const fileWriter = require('./routes/index').fsWriter;
+const timeNow = require('./routes/index').time;
 
 const app = express();
 const backendHost = process.env.BACKEND_HOST;
@@ -58,9 +60,9 @@ request.post(
   },
   (err, res, body) => {
     if (err) {
-      console.log(err.message);
+      fileWriter.write(`[${timeNow}] ${err.message}\n`);
     } else {
-      console.log(`${res.statusCode} | ${body.message}`);
+      fileWriter.write(`[${timeNow}] ${body.message}\n`);
     }
   },
 );

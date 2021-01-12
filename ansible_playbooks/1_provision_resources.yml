@@ -5,7 +5,7 @@
     ssh_key: "{{ lookup('env', 'AZURE_SSH_KEY') }}"
   tasks:
     - name: Fetch and persist azure ssh key
-      shell: source ./aux_files/ssh_key_src.sh
+      shell: source aux_files/ssh_key_src.sh
 
 # ------------------------------- HUB 1 ------------------------------------ #
     ## HUB1 COMMON RESOURCES ##

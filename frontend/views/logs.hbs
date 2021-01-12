@@ -1,3 +1,7 @@
 <div class='logs'>
-    {{contents}}
+    {{#each contents}}
+        <ul class="list-group">
+            <li class="list-group-item">{{this}}</li>
+        </ul>
+    {{/each}}
 </div>
