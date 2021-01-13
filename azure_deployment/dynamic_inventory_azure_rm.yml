@@ -23,6 +23,7 @@ auth_source: credential_file
 # fetches VMs from an explicit list of resource groups instead of default all (- '*')
 include_vm_resource_groups:
 - TestResourceGroup
+- TestResourceGroup2
 
 # fetches VMs from VMSSs in all resource groups (defaults to no VMSS fetch)
 #include_vmss_resource_groups:

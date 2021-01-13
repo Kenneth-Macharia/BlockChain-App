@@ -1,7 +1,8 @@
-# UPDATE HUB SWARM  LEADER IP ADDRESS
 ---
 - hosts: localhost
   gather_facts: true
   tasks:
     - name: Copy orchestration file to swarm leader
-      shell: "scp ./aux_files/start_app.yml azureuser@40.114.231.136:/home/azureuser/"
+    # CHANGE HUB LEADER NAME/IP FOR EACH HUB DEPLOYMENT #
+    # CHANGE INIT_NODE & HOST_IP IN DEPLY FILE PER HUB DEPLOYMENT #
+      shell: "scp ./aux_files/deploy_app.yml azureuser@40.91.231.184:/home/azureuser/"

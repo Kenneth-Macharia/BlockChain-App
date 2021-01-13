@@ -8,6 +8,12 @@
         force_delete_nonempty: yes
         state: absent
 
+    - name: Delete resource group and all its resources
+      azure_rm_resourcegroup:
+        name: TestResourceGroup2
+        force_delete_nonempty: yes
+        state: absent
+
     - name: Delete network watch group and all its resources
       azure_rm_resourcegroup:
         name: NetworkWatcherRG

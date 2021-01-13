@@ -4,10 +4,10 @@ __pycache__
 .coverage
 test_runner
 manager_join_src.sh
-ssh_key_src
 worker_join_src.sh
 node_modules
 backend_logs
 frontend_logs
 test_copy.txt
 local_orchestration
+deploy_app.yml

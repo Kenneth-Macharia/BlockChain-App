@@ -1,14 +1,15 @@
 ---
-- name: Provision two independent blockchain hubs' compute resources
+- name: Provision 2 independent blockchain hubs' resources
   hosts: localhost
+
+  # SET UP AZURE SSH KEY LOCALLY AND SOURCE THE 'ssh_key_src' SCRIPT BEFORE RUNNING THIS PLAYBOOK #
+
   vars:
     ssh_key: "{{ lookup('env', 'AZURE_SSH_KEY') }}"
   tasks:
-    - name: Fetch and persist azure ssh key
-      shell: source aux_files/ssh_key_src
-
 # ------------------------------- HUB 1 ------------------------------------ #
-    ## HUB1 COMMON RESOURCES ##
+
+  # HUB1 COMMON RESOURCES #
     - name: Create resource group
       azure_rm_resourcegroup:
         name: TestResourceGroup
@@ -23,106 +24,106 @@
             protocol: Tcp
             destination_port_range: 80
             access: Allow
-            priority: 100
+            priority: 102
             direction: Inbound
 
           - name: external_traffic_out
             protocol: Tcp
             destination_port_range: 80
             access: Allow
-            priority: 105
+            priority: 104
             direction: Outbound
 
           - name: secure_external_traffic_in
             protocol: Tcp
             destination_port_range: 443
             access: Allow
-            priority: 110
+            priority: 106
             direction: Inbound
 
           - name: secure_external_traffic_out
             protocol: Tcp
             destination_port_range: 443
             access: Allow
-            priority: 115
+            priority: 108
+            direction: Outbound
+
+          - name: external_traffic_2
+            protocol: Tcp
+            destination_port_range: 8080
+            access: Allow
+            priority: 110
+            direction: Inbound
+
+          - name: external_traffic_out_2
+            protocol: Tcp
+            destination_port_range: 8080
+            access: Allow
+            priority: 112
             direction: Outbound
 
           - name: swarm_cluster_management_in
             protocol: Tcp
             destination_port_range: 2377
             access: Allow
-            priority: 120
+            priority: 114
             direction: Inbound
 
           - name: swarm_cluster_management_out
             protocol: Tcp
             destination_port_range: 2377
             access: Allow
-            priority: 130
+            priority: 116
             direction: Outbound
 
           - name: swarm_cluster_node_communication_tcp_in
             protocol: Tcp
             destination_port_range: 7946
             access: Allow
-            priority: 135
+            priority: 118
             direction: Inbound
 
           - name: swarm_cluster_node_communication_tcp_out
             protocol: Tcp
             destination_port_range: 7946
             access: Allow
-            priority: 140
+            priority: 120
             direction: Outbound
 
           - name: swarm_cluster_node_communication_udp_in
             protocol: Udp
             destination_port_range: 7946
             access: Allow
-            priority: 145
+            priority: 122
             direction: Inbound
 
           - name: swarm_cluster_node_communication_udp_out
             protocol: Udp
             destination_port_range: 7946
             access: Allow
-            priority: 150
+            priority: 124
             direction: Outbound
 
           - name: swarm_overlay_network_traffic_in
             protocol: Tcp
             destination_port_range: 4789
             access: Allow
-            priority: 155
+            priority: 126
             direction: Inbound
 
           - name: swarm_overlay_network_traffic_out
             protocol: Tcp
             destination_port_range: 4789
             access: Allow
-            priority: 160
+            priority: 128
             direction: Outbound
 
           - name: SSH
             protocol: Tcp
             destination_port_range: 22
             access: Allow
-            priority: 165
+            priority: 130
             direction: Inbound
-
-          - name: external_traffic_3
-            protocol: Tcp
-            destination_port_range: 8090
-            access: Allow
-            priority: 180
-            direction: Inbound
-
-          - name: external_traffic_out_3
-            protocol: Tcp
-            destination_port_range: 8090
-            access: Allow
-            priority: 185
-            direction: Outbound
 
     - name: Create H1 virtual network
       azure_rm_virtualnetwork:
@@ -137,7 +138,7 @@
         address_prefix: "10.0.1.0/24"
         virtual_network: hub1_vnet
 
-    ## HUB1 VM1 RESOURCES ##
+  # HUB1 VM1 RESOURCES #
     - name: Create H1_VM1 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
@@ -174,7 +175,7 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## HUB1 VM2 RESOURCES ##
+  # HUB1 VM2 RESOURCES #
     - name: Create H1_VM2 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
@@ -211,7 +212,7 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## HUB1 VM3 RESOURCES ##
+  # HUB1 VM3 RESOURCES #
     - name: Create H1_VM3 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup
@@ -250,7 +251,8 @@
 
 
 # ------------------------------- HUB 2 ------------------------------------ #
-    ## HUB2 COMMON RESOURCES ##
+
+  # HUB2 COMMON RESOURCES #
     - name: Create resource group
       azure_rm_resourcegroup:
         name: TestResourceGroup2
@@ -265,125 +267,125 @@
             protocol: Tcp
             destination_port_range: 80
             access: Allow
-            priority: 100
+            priority: 102
             direction: Inbound
 
           - name: external_traffic_out
             protocol: Tcp
             destination_port_range: 80
             access: Allow
-            priority: 105
+            priority: 104
             direction: Outbound
 
           - name: secure_external_traffic_in
             protocol: Tcp
             destination_port_range: 443
             access: Allow
-            priority: 110
+            priority: 106
             direction: Inbound
 
           - name: secure_external_traffic_out
             protocol: Tcp
             destination_port_range: 443
             access: Allow
-            priority: 115
+            priority: 108
+            direction: Outbound
+
+          - name: external_traffic_2
+            protocol: Tcp
+            destination_port_range: 8080
+            access: Allow
+            priority: 110
+            direction: Inbound
+
+          - name: external_traffic_out_2
+            protocol: Tcp
+            destination_port_range: 8080
+            access: Allow
+            priority: 112
             direction: Outbound
 
           - name: swarm_cluster_management_in
             protocol: Tcp
             destination_port_range: 2377
             access: Allow
-            priority: 120
+            priority: 114
             direction: Inbound
 
           - name: swarm_cluster_management_out
             protocol: Tcp
             destination_port_range: 2377
             access: Allow
-            priority: 130
+            priority: 116
             direction: Outbound
 
           - name: swarm_cluster_node_communication_tcp_in
             protocol: Tcp
             destination_port_range: 7946
             access: Allow
-            priority: 135
+            priority: 118
             direction: Inbound
 
           - name: swarm_cluster_node_communication_tcp_out
             protocol: Tcp
             destination_port_range: 7946
             access: Allow
-            priority: 140
+            priority: 120
             direction: Outbound
 
           - name: swarm_cluster_node_communication_udp_in
             protocol: Udp
             destination_port_range: 7946
             access: Allow
-            priority: 145
+            priority: 122
             direction: Inbound
 
           - name: swarm_cluster_node_communication_udp_out
             protocol: Udp
             destination_port_range: 7946
             access: Allow
-            priority: 150
+            priority: 124
             direction: Outbound
 
           - name: swarm_overlay_network_traffic_in
             protocol: Tcp
             destination_port_range: 4789
             access: Allow
-            priority: 155
+            priority: 126
             direction: Inbound
 
           - name: swarm_overlay_network_traffic_out
             protocol: Tcp
             destination_port_range: 4789
             access: Allow
-            priority: 160
+            priority: 128
             direction: Outbound
 
           - name: SSH
             protocol: Tcp
             destination_port_range: 22
             access: Allow
-            priority: 165
+            priority: 130
             direction: Inbound
-
-          - name: external_traffic_3
-            protocol: Tcp
-            destination_port_range: 8090
-            access: Allow
-            priority: 180
-            direction: Inbound
-
-          - name: external_traffic_out_3
-            protocol: Tcp
-            destination_port_range: 8090
-            access: Allow
-            priority: 185
-            direction: Outbound
 
     - name: Create H2 virtual network
       azure_rm_virtualnetwork:
         resource_group: TestResourceGroup2
         name: hub2_vnet
-        address_prefixes: "10.0.0.0/16"
+        address_prefixes: "10.1.0.0/16"
 
     - name: Add H2 subnet
       azure_rm_subnet:
         resource_group: TestResourceGroup2
         name: hub2_vnet_subnet
-        address_prefix: "10.0.2.0/24"
+        address_prefix: "10.1.1.0/24"
         virtual_network: hub2_vnet
 
-    ## HUB2 VM1 RESOURCES ##
+  # HUB2 VM1 RESOURCES #
     - name: Create H2_VM1 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub2_VM1_public_ip
 
     - name: Create H2_VM1 network interface card
@@ -416,11 +418,11 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## HUB2 VM2 RESOURCES ##
+  # HUB2 VM2 RESOURCES #
     - name: Create H2_VM2 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub2_VM2_public_ip
 
     - name: Create H2_VM2 network interface card
@@ -453,11 +455,11 @@
           sku: '18.04-LTS'
           version: latest
 
-    ## HUB2 VM3 RESOURCES ##
+  # HUB2 VM3 RESOURCES #
     - name: Create H2_VM3 public IP address
       azure_rm_publicipaddress:
         resource_group: TestResourceGroup2
-        allocation_method: Static
+        allocation_method: Dynamic
         name: hub2_VM3_public_ip
 
     - name: Create H2_VM3 network interface card

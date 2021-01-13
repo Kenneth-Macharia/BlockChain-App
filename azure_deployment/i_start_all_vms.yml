@@ -1,17 +1,32 @@
 ---
 - hosts: localhost
   tasks:
-    - name: Start VM1
+    - name: Start h1-VM1
       azure_rm_virtualmachine:
         resource_group: TestResourceGroup
         name: hub1-VM1
 
-    - name: Start VM2
+    - name: Start h1-VM2
       azure_rm_virtualmachine:
         resource_group: TestResourceGroup
         name: hub1-VM2
 
-    - name: Start VM3
+    - name: Start h1-VM3
       azure_rm_virtualmachine:
         resource_group: TestResourceGroup
         name: hub1-VM3
+
+    - name: Start h2-VM1
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup2
+        name: hub2-VM1
+
+    - name: Start h2-VM2
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup2
+        name: hub2-VM2
+
+    - name: Start h2-VM3
+      azure_rm_virtualmachine:
+        resource_group: TestResourceGroup2
+        name: hub2-VM3

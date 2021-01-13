@@ -15,8 +15,6 @@ EXPOSE 5000
 
 COPY . .
 
-RUN adduser -D backend_user && chown -R backend_user /usr
+RUN adduser -D azureuser && chown -R azureuser /usr
 
-USER backend_user
-
-# CMD ["python", "-m", "flask", "run", "--host", "0.0.0.0"]
+USER azureuser
