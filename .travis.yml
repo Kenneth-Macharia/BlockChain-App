@@ -36,6 +36,7 @@ script:
   - coverage run -m --source=src/app unittest
   - coverage report -m
   - cd ..
+  - pwd
 after_success:
   - coveralls
 deploy:
