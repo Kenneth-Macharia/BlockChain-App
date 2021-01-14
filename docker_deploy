@@ -1,5 +1,5 @@
 #!/bin/bash
-docker build -t "$DOCKER_REPO"/blockchain-backend backend/src/
+docker build -t "$DOCKER_REPO"/blockchain-backend backend/
 docker build -t "$DOCKER_REPO"/blockchain-frontend frontend/
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 docker push "$DOCKER_REPO"/blockchain-backend:latest
