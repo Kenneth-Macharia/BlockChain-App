@@ -1,4 +1,3 @@
-# CAUTION: REMOVES ALL IMAGES, NETWORKS, CONTAINERS AND VOLUMES!
 ---
 - hosts: all
   become: true

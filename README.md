@@ -40,4 +40,28 @@
 - Multiple hubs (each containing a 3-node cluster) can be spun up to create a blockchain peer network.
 - Each hub will run the application on it's cluster and store it's own blockchain of the records.
 - Record queries as well as additions can be perfomed at each of the hubs.
-- Each hub will automatically sync with the other peer hubs via an API in the falsk service, before forging a new block/ transaction, to gurantee the blockchain's validity across the peer network.
+- Each hub will automatically sync with the other peer hubs via an API in the flask service, before forging a new block/ transaction, to gurantee the blockchain's validity across the peer network.
+
+## The App Demo
+
+- The application is currently deployed to _Azure_ as two independent blockchain hubs/peers.
+- Hub 1 is on a VPN with _address space 10.0.0.0/16_ while Hub 2 is on a separate VPN with _address space 10.1.0.0/16_ and are not connected in any way.
+- VMs on one hub cannot communicate directly with VMs on the other hub across Azure's network. The only way for inter-hub communication is via breaking out to the internet, thus mimicking a distributed blockchain network.
+
+### Hub 1
+
+- Hub 1 runs on a _Docker swarm cluster_ consisting of _3 linux VMs_.
+- The _frontend service_ is accessible on `40.91.231.184`, from where records can be added and searched for as well as viewing of application logs.
+- For demo purposes, _the backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible at `40.91.231.184:8080/backend/v1/blockchain`.
+
+### Hub 2
+
+- Hub 2 runs on a _Docker swarm cluster_ consisting of _3 linux VMs_ as well.
+- The _frontend service_ is accessible on `52.188.123.100`, from where records can be added and searched for as well as viewing of application logs.
+- For demo purposes, _the backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible at `52.188.123.100:8080/backend/v1/blockchain`.
+
+## Using the App
+
+- Upon loading the frontend, there is a short intro video showcasing how to use the application.
+- Create a record on hub1 and check the blockchain on both hub using the backend service blockchain endpoint.
+- Create a record on hub two and confirm that it's blockchain first gets updated with hub 1's blockchain before the new reocrd is added, demonstrating the sync functionlity that ensure the two blockchains remain valid and identical.
