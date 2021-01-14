@@ -35,13 +35,11 @@ script:
   - cd backend
   - coverage run -m --source=src/app unittest
   - coverage report -m
-  - cd ..
-  - pwd
 after_success:
   - coveralls
 deploy:
   provider: script
-  script: bash ./docker_deploy
+  script: bash ../docker_deploy
   skip_cleanup: true
   on:
     branch: master
