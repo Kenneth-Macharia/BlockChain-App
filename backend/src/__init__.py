@@ -27,6 +27,7 @@ def create_app(config_object=app_configs):
 
     # Add configs
     app.config.from_object(config_object)
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
     # Initialize plugins
     mongo.init_app(app)
