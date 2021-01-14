@@ -12,8 +12,8 @@ EXPOSE 3000
 
 COPY . .
 
-# RUN adduser -D azureuser
+RUN adduser -D azureuser && chown -R azureuser /usr
 
-# USER azureuser
+USER azureuser
 
 CMD ["npm", "start"]
