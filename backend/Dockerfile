@@ -1,6 +1,3 @@
-# Use non-root user to run the container
-# Scan image for vulnerabilities using during or after CI build
-
 FROM python:3.7.7-alpine3.11
 
 RUN apk add --update && mkdir -p /usr/src
@@ -15,6 +12,6 @@ EXPOSE 5000
 
 COPY . .
 
-RUN adduser -D azureuser && chown -R azureuser /usr
+# RUN adduser -D azureuser && chown -R azureuser /usr
 
-USER azureuser
+# USER azureuser
