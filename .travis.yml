@@ -35,7 +35,6 @@ script:
   - cd backend
   - coverage run -m --source=src/app unittest
   - coverage report -m
-  - pwd
 after_success:
   - coveralls
 deploy:
