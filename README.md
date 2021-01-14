@@ -51,14 +51,14 @@
 ### Hub 1
 
 - Hub 1 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_.
-- The _frontend service_ is accessible on `40.91.231.184`, from where records can be added and searched.
+- The _frontend service_ is accessible at `40.91.231.184`, from where records can be added and searched.
 - From the provided drop-down list link, application logs, handy for checking block forging status can be viewed.
 - For demo purposes, _the backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible at `40.91.231.184:8080/backend/v1/blockchain`.
 
 ### Hub 2
 
 - Hub 2 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_ as well.
-- It's _frontend service_ is accessible on `52.188.123.100`.
+- It's _frontend service_ is accessible at `52.188.123.100`.
 - The blockchain endpoint for this hub is accessible at `52.188.123.100:8080/backend/v1/blockchain`.
 
 ## Using the App
