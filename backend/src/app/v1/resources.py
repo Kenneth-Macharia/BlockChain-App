@@ -4,16 +4,27 @@ import json
 from flask import request
 from flask_restful import Resource
 from .controllers import SecurityController, NodeController, BlockController
+from ...configs import init_node
 
 
 class SystemResource(Resource):
     '''Manages sytem checks requests by the frontend'''
 
     def post(self):
-        '''Initializes the backend'''
+        '''Updates both blockchainand node registry on hub initialization'''
 
-        BlockController()
-        return {'message': 'Blockchain initialized.'}, 201
+        blocks = BlockController()
+        payload = 'Blockchain initialized'
+        status = 201
+
+        if init_node:
+            response = blocks.sync(update_chain=True)
+
+            if response:
+                payload = 'Backend sync error, contact IT!'
+                status = 500
+
+        return {'message': payload}, status
 
 
 class NodeResources(Resource):
