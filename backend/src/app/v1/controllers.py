@@ -253,7 +253,7 @@ class BlockController:
 
             search_criteria = [
                 validation_data['plot_number'],
-                # validation_data['seller_id'],
+                validation_data['seller_id'],
                 validation_data['buyer_id']
             ]
 
