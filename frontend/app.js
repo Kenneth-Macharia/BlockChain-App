@@ -58,7 +58,7 @@ request.post(
   `http://${backendHost}:5000/backend/v1/init`,
   {
     json: true,
-    agent: new Agent({ timeout: 3000 }),
+    agent: new Agent({ timeout: 5000 }),
   },
   (err, res, body) => {
     if (err) {

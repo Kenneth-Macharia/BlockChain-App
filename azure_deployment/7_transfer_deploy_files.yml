@@ -5,4 +5,4 @@
     - name: Copy orchestration file to swarm leader
     # CHANGE HUB LEADER NAME/IP FOR EACH HUB DEPLOYMENT #
     # CHANGE INIT_NODE & HOST_IP IN DEPLY FILE PER HUB DEPLOYMENT #
-      shell: "scp ./aux_files/deploy_app.yml azureuser@40.91.231.184:/home/azureuser/"
+      shell: "scp ./aux_files/deploy_app.yml azureuser@13.82.103.145:/home/azureuser/"
