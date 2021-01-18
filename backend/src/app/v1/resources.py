@@ -3,8 +3,9 @@
 import json
 from flask import request
 from flask_restful import Resource
-from .controllers import SecurityController, NodeController, BlockController
-from ...configs import init_node
+from .controllers import (SecurityController, NodeController,
+                          BlockController, CacheController)
+from ...configs import init_node, public_ip, port
 
 
 class SystemResource(Resource):
@@ -70,8 +71,8 @@ class BlockResources(Resource):
     '''Manages block resources'''
 
     def get(self):
-        '''Exposes the protected get entire blockchain endpoint to ther peer
-        nodes -> json'''
+        '''Exposes the protected get entire blockchain endpoint to the peer
+        network -> json'''
 
         header = request.headers
 
@@ -112,13 +113,61 @@ class BlockResources(Resource):
 
         return response, status_code
 
+    def post(self):
+        '''Exposes the protected update blockchain to the peer network -> json.
+
+        To ensure the peer network keep the blockchain updated and in
+        sync in realtime, a hub that forges a new block on its blockchain,
+        will send it's updated blockchain to all peer hubs to validate
+        and update their blockchains.
+        '''
+
+        header = request.headers
+        data = request.get_json()
+
+        if 'Api-Key' not in header.keys() or 'Url' not in header.keys():
+
+            message = 'Invalid Request'
+            status_code = 400
+
+        else:
+            security = SecurityController()
+            url = security.authorize_node(header)
+
+            if not url:
+                message = 'Unauthorized node'
+                status_code = 401
+
+            else:
+                blocks = BlockController()
+                result = blocks.extract_chain()
+
+                if len(data) > len(result) and \
+                        security.validate_chain(data):
+                    blocks.replace_blockchain(data)
+                    CacheController().update_blockchain_cache(data[1:])
+
+                    message = f'{public_ip}:{port} Updated'
+                    status_code = 201
+
+                else:
+                    message = f'Error updating {public_ip}:{port}'
+                    status_code = 500
+
+        response = {
+            'message': message,
+        }
+
+        return response, status_code
+
 
 class BlockResource(Resource):
     '''Manages a block resource'''
 
     def post(self):
         '''Exposes the backend transaction validation endpoint, internally
-        to the frontend service -> json
+        to the frontend service and ensures that invalid transactions are
+        not recorded -> json
         '''
 
         values = request.get_json()

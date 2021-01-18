@@ -1,3 +1,4 @@
+const { Agent } = require('http');
 const createError = require('http-errors');
 const express = require('express');
 const request = require('request');
@@ -57,6 +58,7 @@ request.post(
   `http://${backendHost}:5000/backend/v1/init`,
   {
     json: true,
+    agent: new Agent({ timeout: 3000 }),
   },
   (err, res, body) => {
     if (err) {
