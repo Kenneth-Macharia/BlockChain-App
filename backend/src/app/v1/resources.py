@@ -171,29 +171,20 @@ class BlockResource(Resource):
         '''
 
         values = request.get_json()
-
         validation_data = {
-            'plot_number': values['plot_number'],
-            'seller_id': values['seller_id'],
             'buyer_id': values['buyer_id'],
         }
 
         result = BlockController().validate_transaction(validation_data)
-        message, status_code, payload = '', 0, []
+        message, status_code = '', 0
 
         if result:
             status_code = 400
             message = result
         else:
             status_code = 200
-            message = 'transaction is unique'
 
-        response = {
-            'message': message,
-            'payload': payload
-        }
-
-        return response, status_code
+        return message, status_code
 
 
 class BlockResourcesDemo(Resource):

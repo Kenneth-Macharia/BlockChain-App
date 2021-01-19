@@ -1,3 +1,4 @@
+const { Agent } = require('http');
 const express = require('express');
 const redis = require('redis');
 const request = require('request');
@@ -24,7 +25,7 @@ const redisClient = redis.createClient({
 
 // Connect to redis client
 redisClient.on('connect', () => {
-  writer.write(`[${currTime}] Connected to the Redis database.\n`);
+  writer.write(`[${currTime}] Connected to the Redis database\n`);
 });
 
 // Homepage route
@@ -75,55 +76,47 @@ router.post('/add', (req, res) => {
     transaction_cost: req.body.trans_cost,
   };
 
-  let cacheErr = '';
-
-  // unique transaction verification
+  // valid transaction verification
   request.post(
     `http://${backendHost}:5000/backend/v1/block`,
     {
-      json: {
-        plot_number: transaction.plot_num,
-        buyer_id: transaction.buyer_id,
-        seller_id: transaction.seller_id,
-      },
+      json: { buyer_id: transaction.buyer_id },
     },
-    (err, response, body) => {
+    (err, response) => {
       if (response.statusCode === 200) {
         redisClient.rpush('records_queue', JSON.stringify(transaction), (
           error,
         ) => {
           if (!error) {
             redisClient.persist('records_queue');
+            res.render('index', {
+              title: 'Agile Records MIS',
+              info: true,
+              msg: 'Transaction queued. Check logs for save status',
+              class: 'badge-info',
+            });
           } else {
-            cacheErr = error;
+            res.render('index', {
+              title: 'Agile Records MIS',
+              err: true,
+              msg: error,
+              class: 'badge-danger',
+            });
           }
         });
-      } else if (response.statusCode === 400) {
-        cacheErr = body;
       } else {
-        cacheErr = err;
+        res.render('index', {
+          title: 'Agile Records MIS',
+          err: true,
+          msg: response.body,
+          class: 'badge-danger',
+        });
       }
     },
   );
-
-  if (!cacheErr) {
-    res.render('index', {
-      title: 'Agile Records MIS',
-      info: true,
-      msg: 'Transaction queued. Check logs for save status',
-      class: 'badge-info',
-    });
-  } else {
-    res.render('index', {
-      title: 'Agile Records MIS',
-      err: true,
-      msg: cacheErr,
-      class: 'badge-danger',
-    });
-  }
 });
 
-// Forge logging
+// Block creation logging
 router.post('/alerts', (req) => {
   const resMsg = req.body;
 
@@ -134,7 +127,7 @@ router.post('/alerts', (req) => {
   }
 });
 
-// Render logs page
+// Logs page route
 router.get('/logs', (req, res) => {
   fs.readFile(`${cwd}/frontend_logs`, 'utf8', (err, data) => {
     const fileArray = data.split('\n');

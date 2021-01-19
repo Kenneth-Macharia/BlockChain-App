@@ -249,17 +249,10 @@ class BlockController:
 
         if isinstance(
             validation_data, dict) and validation_data.get(
-                'plot_number', False):
+                'buyer_id', False):
 
-            search_criteria = [
-                validation_data['plot_number'],
-                validation_data['seller_id'],
-                validation_data['buyer_id']
-            ]
-
-            if self.blockchain_db.block_exists(search_criteria):
-                return {'validation_error': 'Invalid Transaction. \
-                Re-check input data'}
+            if self.blockchain_db.block_exists(validation_data['buyer_id']):
+                return 'Invalid Transaction. Re-check input data'
 
     def replace_blockchain(self, chain):
         '''Replaces the blockchain with an valid updated one from

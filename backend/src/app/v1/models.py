@@ -54,15 +54,12 @@ class BlockModel:
         '''Checks if a block in the chain matching the search criteria
         list -> Boolean'''
 
-        query_result = self.__db_conn.find_one(
-            {"$and": [
-                {"transaction.plot_num": {'$eq': criteria[0]}},
-                {"transaction.seller_id": {'$eq': criteria[1]}},
-                {"transaction.buyer_id": {'$eq': criteria[2]}}
-            ]}
+        cur_obj = self.__db_conn.find(
+            {"transaction.buyer_id": criteria}
         )
 
-        return True if query_result else False
+        query_result = [document for document in cur_obj]
+        return True if len(query_result) > 0 else False
 
     def get_chain(self, length=False):
         '''Returns the entire block_chain or it's length if param[length] is
