@@ -1,0 +1,10 @@
+---
+- hosts: tag_Ansible_swarm_leader
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Update Backend
+      shell: "docker service update blockchain_backend"
+
+    - name: Update Frontend
+      shell: "docker service update blockchain_frontend"

@@ -369,7 +369,7 @@ class TestBlockChain(TestCase):
                 data=json.dumps(NEW_TRANSACTION))
 
             # self.assertEqual(response.status_code, 400)
-            res_payload = json.loads(response.data)['payload']
+            # res_payload = json.loads(response.data)['payload']
             # self.assertIn('Transaction already exist', res_payload)
 
 
