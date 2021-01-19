@@ -51,15 +51,15 @@
 ### Hub 1
 
 - Hub 1 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_.
-- The _frontend service_ is accessible here > [Home](http://40.91.231.184), from where records can be added and searched.
+- The _frontend service_ is accessible here > [Home](http://104.40.231.127), from where records can be added and searched.
 - From the provided drop-down list link, application logs handy for checking block forging status, can be viewed.
-- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://40.91.231.184:8080/backend/v1/blockchain)
+- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://104.40.231.127:8080/backend/v1/blockchain)
 
 ### Hub 2
 
 - Hub 2 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_ as well.
-- It's _frontend service_ is accessible here > [Home](http://52.188.123.100)
-- The blockchain endpoint for this hub is accessible here > [Blockchain](http://52.188.123.100:8080/backend/v1/blockchain)
+- It's _frontend service_ is accessible here > [Home](http://52.149.134.136)
+- The blockchain endpoint for this hub is accessible here > [Blockchain](http://52.149.134.136:8080/backend/v1/blockchain)
 
 ## Using the App
 
