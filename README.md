@@ -42,7 +42,7 @@
 - Record queries from and additions to the blockchain can be perfomed at each of the hubs.
 - Each hub will automatically sync with the other peer hubs via an API in the flask service, before forging/adding a new block/ transaction, to gurantee the blockchain's validity across the peer network.
 
-## App Demo
+## App Demo `APP IS TEMPORARILY DOWN FOR MAINTENANCE`
 
 - The application is deployed to _Azure_ on two independent blockchain hubs/peers.
 - Hub 1 is on a VPN with _address space 10.0.0.0/16_ while Hub 2 is on a separate VPN with _address space 10.1.0.0/16_ and the two are not connected in any way.
