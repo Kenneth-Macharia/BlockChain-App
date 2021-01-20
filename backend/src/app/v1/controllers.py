@@ -57,8 +57,6 @@ class CacheController:
             for transaction in transactions:
                 record = json.loads(transaction[1].decode('utf-8'))
                 result = BlockController().forge_block(transaction=record)
-
-            # work around for testing
                 requests.post(f'http://{fe_host}:3000/alerts', data=result)
         else:
             if testing:
