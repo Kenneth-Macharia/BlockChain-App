@@ -276,7 +276,7 @@ class NodeController:
         self.node_host = f'{public_ip}:{port}'
         # {'198.162.1.2:5000'}
 
-        if init_node:
+        if init_node != 0:
             self.register_node(init_node)
 
     def register_node(self, node_url):

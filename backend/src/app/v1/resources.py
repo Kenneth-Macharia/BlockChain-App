@@ -17,16 +17,16 @@ class SystemResource(Resource):
         payload = ''
         status = 0
 
-        if init_node != '':
-            response = BlockController().sync(update_chain=True)
-
-            if response:
-                payload = 'Backend sync error, contact IT!'
-                status = 500
-        else:
+        if init_node == 0:
             BlockController()
             payload = 'Blockchain initialized'
             status = 201
+
+        else:
+            response = BlockController().sync(update_chain=True)
+            if response:
+                payload = 'Backend sync error, contact IT!'
+                status = 500
 
         return {'message': payload}, status
 
