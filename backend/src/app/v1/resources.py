@@ -14,16 +14,19 @@ class SystemResource(Resource):
     def post(self):
         '''Updates both blockchainand node registry on hub initialization'''
 
-        blocks = BlockController()
-        payload = 'Blockchain initialized'
-        status = 201
+        payload = ''
+        status = 0
 
         if init_node:
-            response = blocks.sync(update_chain=True)
+            response = BlockController().sync(update_chain=True)
 
             if response:
                 payload = 'Backend sync error, contact IT!'
                 status = 500
+        else:
+            BlockController()
+            payload = 'Blockchain initialized'
+            status = 201
 
         return {'message': payload}, status
 
