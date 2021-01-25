@@ -40,26 +40,26 @@
 - Multiple hubs (each containing a multi-node cluster) can be spun up to create a blockchain peer network.
 - Each hub will run the application on it's cluster and store it's own blockchain of the records.
 - Record queries from and additions to the blockchain can be perfomed at each of the hubs.
-- Each hub will automatically sync with the other peer hubs via an API in the flask service, before forging/adding a new block/ transaction, to gurantee the blockchain's validity across the peer network.
+- Each hub will automatically sync with the other peer hubs via an API in the flask service, to gurantee the blockchain's validity across the peer network.
 
-## App Demo `APP IS TEMPORARILY DOWN FOR MAINTENANCE`
+## App Demo
 
 - The application is deployed to _Azure_ on two independent blockchain hubs/peers.
 - Hub 1 is on a VPN with _address space 10.0.0.0/16_ while Hub 2 is on a separate VPN with _address space 10.1.0.0/16_ and the two are not connected in any way.
-- VMs on one hub cannot communicate directly with VMs on the other hub across Azure's network. Inter-hub communication is only possible via the internet, thus mimicking a distributed blockchain network.
+- VMs on one hub cannot communicate directly with VMs on the other hub across Azure's network. Inter-hub communication is only possible via the internet, thus emulating a distributed blockchain network.
 
 ### Hub 1
 
 - Hub 1 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_.
-- The _frontend service_ is accessible here > [Home](http://104.40.231.127), from where records can be added and searched.
+- The _frontend service_ is accessible here > [Home](http://13.94.196.178), from where records can be added and searched.
 - From the provided drop-down list link, application logs handy for checking block forging status, can be viewed.
-- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://104.40.231.127:8080/backend/v1/blockchain)
+- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://13.94.196.178:8080/backend/v1/blockchain)
 
 ### Hub 2
 
 - Hub 2 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_ as well.
-- It's _frontend service_ is accessible here > [Home](http://52.149.134.136)
-- The blockchain endpoint for this hub is accessible here > [Blockchain](http://52.149.134.136:8080/backend/v1/blockchain)
+- It's _frontend service_ is accessible here > [Home](http://13.92.103.222)
+- The blockchain endpoint for this hub is accessible here > [Blockchain](http://13.92.103.222:8080/backend/v1/blockchain)
 
 ## Using the App
 
@@ -67,16 +67,22 @@
   the homepage.
 - Test tasks:
 
-   1. Create a record on hub1 and check the current blockchains on both hubs.
-   2. Create a record on hub 2 and confirm that it's blockchain first gets
-      updated with hub 1's blockchain before the new record is added,
-      demonstrating the sync functionality that ensures the peer blockchains
-      remain valid and identical.
+   1. Check the current blockchain on both hubs.
+   2. Create a record on either hubs (Give it a moment to forge & sync)
+   3. Verify the record exists on the hub created on and the other one as well.
+
+- When a peer hub adds a new record, it prompts the other peer hubs to update
+  their blockchains as well thus ensuring the blockchain is up-to date always. This
+  is achieved through the validation and syncing process where each hub examines
+  the newly updated blockchain and if more recent than the local copy, then the local
+  copy is updated.
+- This blockchain auto-sync ensures that the entire network keeps an updated copy
+  of the blockchain thus facilitating searching of real-time updated records.
 
 - Types of entries that can be added for an asset:
 
    1. New Record: when the asset has not yet been recorded on the
-      blockchain. This happens when a search yield not results and the
+      blockchain. This happens when a search yields no results and the
       app allows you to add the asset's initial transfer transaction.
 
    2. Add transaction to record: when an asset exists; the app allows
