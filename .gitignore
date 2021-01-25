@@ -11,3 +11,4 @@ frontend_logs
 test_copy.txt
 local_orchestration
 deploy_app.yml
+archive

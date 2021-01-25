@@ -171,6 +171,7 @@ class BlockController:
 
                 if err_res:
                     for msg in err_res['update_error_nodes']:
+                        # TODO: Remove
                         print(f'>>>>{msg}')
                         logs_file.write(f"[{curr_time}] {msg['message']}\n")
 
