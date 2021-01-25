@@ -12,6 +12,6 @@ EXPOSE 5000
 
 COPY . .
 
-RUN adduser -D azureuser && chown -R azureuser /usr
+# RUN adduser -D azureuser && chown -R azureuser /usr
 
-USER azureuser
+# USER azureuser
