@@ -11,7 +11,3 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 COPY . .
-
-# RUN adduser -D azureuser && chown -R azureuser /usr
-
-# USER azureuser
