@@ -17,7 +17,7 @@ class SystemResource(Resource):
         payload = ''
         status = 0
 
-        if init_node == 0:
+        if not init_node:
             BlockController()
             payload = 'Blockchain initialized'
             status = 201
