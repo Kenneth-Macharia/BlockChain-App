@@ -17,7 +17,7 @@ class SystemResource(Resource):
         payload = ''
         status = 0
 
-        if init_node:
+        if init_node != '':
             response = BlockController().sync(update_chain=True)
 
             if response:
