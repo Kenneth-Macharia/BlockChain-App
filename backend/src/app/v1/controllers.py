@@ -32,20 +32,21 @@ class CacheController:
     def update_blockchain_cache(self, records):
         '''Formats blockchain data before adding to redis cache -> None'''
 
-        for record in records:
-            data = {
-                'PlotNumber': '',
-                'OwnerName': record['transaction']['buyer_name'],
-                'OwnerID': record['transaction']['buyer_id'],
-                'OwnerTel': record['transaction']['buyer_tel'],
-                'County': record['transaction']['county'],
-                'Location': record['transaction']['location'],
-                'Size(Acres)': record['transaction']['size'],
-                'RecordedOn': record['date']
-                }
+        if records:
+            for record in records:
+                data = {
+                    'PlotNumber': '',
+                    'OwnerName': record['transaction']['buyer_name'],
+                    'OwnerID': record['transaction']['buyer_id'],
+                    'OwnerTel': record['transaction']['buyer_tel'],
+                    'County': record['transaction']['county'],
+                    'Location': record['transaction']['location'],
+                    'Size(Acres)': record['transaction']['size'],
+                    'RecordedOn': record['date']
+                    }
 
-            self.cache_db.push_to_cache(
-                record['transaction']['plot_num'], json.dumps(data))
+                self.cache_db.push_to_cache(
+                    record['transaction']['plot_num'], json.dumps(data))
 
     def fetch_new_transactions(self):
         '''Gets new transactions to forge into blocks from Redis
@@ -162,16 +163,18 @@ class BlockController:
 
             # Send updated blockchain to all peers to update theirs
             nodes = self.node_controller.extract_nodes()
-            err_res = self.net_controller.send_data(nodes, blockchain)
+            if nodes:
+                err_res = self.net_controller.send_data(nodes, blockchain)
 
-            # Log update responses from peer hubs
-            logs_file = open(Path.cwd()/'backend_logs', 'a')
+                # Log update responses from peer hubs
+                logs_file = open(Path.cwd()/'backend_logs', 'a')
 
-            if err_res:
-                for msg in err_res['update_error_nodes']:
-                    logs_file.write(f"[{curr_time}] {msg['message']}\n")
+                if err_res:
+                    for msg in err_res['update_error_nodes']:
+                        print(f'>>>>{msg}')
+                        logs_file.write(f"[{curr_time}] {msg['message']}\n")
 
-            logs_file.close()
+                logs_file.close()
 
         return {'success': transaction.get("plot_num", None)}
 

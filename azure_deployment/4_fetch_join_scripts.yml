@@ -7,8 +7,8 @@
 
     - name: Copy manager join script file from swarm leader
     # CHANGE HUB LEADER IP FOR EACH HUB DEPLOYMENT
-      shell: "scp azureuser@40.87.28.197:/home/azureuser/manager_join_src.sh ./aux_files/"
+      shell: "scp azureuser@13.92.103.222:/home/azureuser/manager_join_src.sh ./aux_files/"
 
-    - name: Copy worker join script file from swarm leader
-    # CHANGE HUB LEADER IP FOR EACH HUB DEPLOYMENT
-      shell: "scp azureuser@40.87.28.197:/home/azureuser/worker_join_src.sh ./aux_files/"
+    # - name: Copy worker join script file from swarm leader
+    # # CHANGE HUB LEADER IP FOR EACH HUB DEPLOYMENT
+    #   shell: "scp azureuser@40.87.28.197:/home/azureuser/worker_join_src.sh ./aux_files/"
