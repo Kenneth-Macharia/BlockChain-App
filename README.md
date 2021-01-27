@@ -42,7 +42,7 @@
 - Record queries from and additions to the blockchain can be perfomed at each of the hubs.
 - Each hub will automatically sync with the other peer hubs via an API in the flask service, to gurantee the blockchain's validity across the peer network.
 
-## App Demo
+## App Demo `APP IS TEMPORARILY DOWN FOR MAINTANANCE`
 
 - The application is deployed to _Azure_ on two independent blockchain hubs/peers.
 - Hub 1 is on a VPN with _address space 10.0.0.0/16_ while Hub 2 is on a separate VPN with _address space 10.1.0.0/16_ and the two are not connected in any way.
@@ -87,58 +87,3 @@
 
    2. Add transaction to record: when an asset exists; the app allows
       you to add a subsequent transfer record to the existing asset.
-
-`{
-    "message": "Blockchain",
-    "payload": [
-        {
-            "index": 1,
-            "date": "2021-01-25",
-            "transaction": {
-                "seed_block": "blockchain_initialized"
-            },
-            "proof": 100,
-            "previous_hash": 10
-        },
-        {
-            "index": 2,
-            "date": "2021-01-25",
-            "transaction": {
-                "plot_num": "plt24794779",
-                "size": "1",
-                "county": "Nairobi",
-                "location": "Dagoretti",
-                "buyer_name": "Jecinta Kiprop",
-                "buyer_id": "22893837",
-                "buyer_tel": "0720389471",
-                "seller_name": "Tom Kinyua",
-                "seller_id": "20987654",
-                "seller_tel": "0722897564",
-                "transaction_value": "985300",
-                "transaction_cost": "2500"
-            },
-            "proof": 35293,
-            "previous_hash": "f20ae3b7205848c84300c2528cd6f63220965aed2acb0a3ae5ccf9e1d0694be2"
-        },
-        {
-            "index": 3,
-            "date": "2021-01-25",
-            "transaction": {
-                "plot_num": "plt46295739",
-                "size": "3",
-                "county": "Nyeri",
-                "location": "Othaya",
-                "buyer_name": "Samuel Kiarie",
-                "buyer_id": "20394824",
-                "buyer_tel": "0722968316",
-                "seller_name": "Angela Muthama",
-                "seller_id": "23123459",
-                "seller_tel": "0723784593",
-                "transaction_value": "1750000",
-                "transaction_cost": "2500"
-            },
-            "proof": 35089,
-            "previous_hash": "ae726c102da6bb0d90afc8dd5b6cd5719a8fa3cbccba22c1bdae6bef203182aa"
-        }
-    ]
-}`
