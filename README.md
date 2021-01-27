@@ -42,24 +42,22 @@
 - Record queries from and additions to the blockchain can be perfomed at each of the hubs.
 - Each hub will automatically sync with the other peer hubs via an API in the flask service, to gurantee the blockchain's validity across the peer network.
 
-## App Demo `APP IS TEMPORARILY DOWN FOR MAINTANANCE`
+## App Demo
 
-- The application is deployed to _Azure_ on two independent blockchain hubs/peers.
-- Hub 1 is on a VPN with _address space 10.0.0.0/16_ while Hub 2 is on a separate VPN with _address space 10.1.0.0/16_ and the two are not connected in any way.
-- VMs on one hub cannot communicate directly with VMs on the other hub across Azure's network. Inter-hub communication is only possible via the internet, thus emulating a distributed blockchain network.
+- The application is deployed to _GCP_ on two independent blockchain hubs/peers.
+- Each of the hubs are on different subnets in different regions.
+- VMs on one hub cannot communicate directly with VMs on the other hub across GCP's network. Inter-hub communication is only possible via the internet, thus emulating a distributed blockchain network.
 
 ### Hub 1
 
-- Hub 1 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_.
-- The _frontend service_ is accessible here > [Home](http://13.94.196.178), from where records can be added and searched.
+- The _frontend service_ is accessible here > [Home](http://35.211.97.185), from where records can be added and searched.
 - From the provided drop-down list link, application logs handy for checking block forging status, can be viewed.
-- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://13.94.196.178:8080/backend/v1/blockchain)
+- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://35.211.97.185:8080/backend/v1/blockchain)
 
 ### Hub 2
 
-- Hub 2 runs on a _Docker swarm cluster_ consisting of _3 Linux VMs_ as well.
-- It's _frontend service_ is accessible here > [Home](http://13.92.103.222)
-- The blockchain endpoint for this hub is accessible here > [Blockchain](http://13.92.103.222:8080/backend/v1/blockchain)
+- It's _frontend service_ is accessible here > [Home](http://35.210.175.76)
+- The blockchain endpoint for this hub is accessible here > [Blockchain](http://35.210.175.76:8080/backend/v1/blockchain)
 
 ## Using the App
 

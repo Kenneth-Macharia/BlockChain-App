@@ -12,3 +12,4 @@ test_copy.txt
 local_orchestration
 docker-compose.yml
 archive
+azure_deploy

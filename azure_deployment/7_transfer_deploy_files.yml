@@ -1,8 +1,0 @@
----
-- hosts: localhost
-  gather_facts: true
-  tasks:
-    - name: Copy orchestration file to swarm leader
-    # CHANGE HUB LEADER NAME/IP FOR EACH HUB DEPLOYMENT #
-    # CHANGE INIT_NODE & HOST_IP IN DEPLY FILE PER HUB DEPLOYMENT #
-      shell: "scp ./aux_files/docker-compose.yml azureuser@13.94.196.178:/home/azureuser/"
