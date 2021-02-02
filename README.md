@@ -44,20 +44,20 @@
 
 ## App Demo
 
-- The application is deployed to _GCP_ on two independent blockchain hubs/peers.
-- Each of the hubs are on different subnets in different regions.
-- VMs on one hub cannot communicate directly with VMs on the other hub across GCP's network. Inter-hub communication is only possible via the internet, thus emulating a distributed blockchain network.
+- The application is deployed to _GCP_ on two independent blockchain hubs, each comprising 3 Linux VMs and runnig 2 replicas of each of the 4 services mention above.
+- Each of the hubs are on different subnets in different regions and the applications on each hub communicate over
+  the internet and not across the VPC network.
 
 ### Hub 1
 
-- The _frontend service_ is accessible here > [Home](http://35.211.97.185), from where records can be added and searched.
+- The _frontend service_ is accessible here > [Home](http://35.206.155.11), from where records can be added and searched.
 - From the provided drop-down list link, application logs handy for checking block forging status, can be viewed.
-- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://35.211.97.185:8080/backend/v1/blockchain)
+- _The backend service exposes a public endpoint_ allowing the viewing of the blockchain at the hub. This endpoint is accessible here > [Blockchain](http://35.206.155.11:8080/backend/v1/blockchain)
 
 ### Hub 2
 
-- It's _frontend service_ is accessible here > [Home](http://35.210.175.76)
-- The blockchain endpoint for this hub is accessible here > [Blockchain](http://35.210.175.76:8080/backend/v1/blockchain)
+- It's _frontend service_ is accessible here > [Home](http://35.211.54.229)
+- The blockchain endpoint for this hub is accessible here > [Blockchain](http://35.211.54.229:8080/backend/v1/blockchain)
 
 ## Using the App
 
@@ -66,7 +66,7 @@
 - Test tasks:
 
    1. Check the current blockchain on both hubs.
-   2. Create a record on either hubs (Give it a moment to forge & sync)
+   2. Create a record on either hubs and give it a moment to forge & sync.
    3. Verify the record exists on the hub created on and the other one as well.
 
 - When a peer hub adds a new record, it prompts the other peer hubs to update
