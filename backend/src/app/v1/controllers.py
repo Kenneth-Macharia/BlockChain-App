@@ -264,6 +264,10 @@ class BlockController:
         for block in chain:
             self.blockchain_db.persist_new_block(block)
 
+        # Update the Redis cache
+        blockchain = self.extract_chain()
+        self.cache_controller.update_blockchain_cache(blockchain[1:])
+
 
 class NodeController:
     '''Manages node registration and access to the node registry'''
