@@ -41,7 +41,7 @@
 
 ## Use Case
 
-- Multiple sites/hubs (each with a multi-node cluster) can be spun up to create a blockchain peer network e.g at 1 per county.
+- Multiple sites/hubs (each with a multi-node cluster) can be spun up to create a blockchain peer network e.g 1 per county.
 - Each hub will run the application on it's cluster and store it's own blockchain of the records.
 - Records can be queried and additions to the blockchain can be perfomed at each of the hubs.
 - Each hub will automatically sync with the other peer hubs to gurantee the blockchain's validity and homogeneity across the peer network.
